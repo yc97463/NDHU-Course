@@ -8,6 +8,9 @@ export default function CourseDetailPage({ children }) {
   let { cid } = useRouter().query;
   const courseInfo = {
     cid: cid,
+    year: "111",
+    semester: "2",
+
     subjid: "AM__3120AA",
     subjname: "代數(二)AA",
     score: "3",
@@ -23,16 +26,25 @@ export default function CourseDetailPage({ children }) {
   return (
     <div>
       <Head>
-        <title>{courseInfo.subjname + " - " + courseInfo.depname}</title>
+        <title>
+          {courseInfo.year +
+            courseInfo.semester +
+            courseInfo.subjname +
+            " - " +
+            courseInfo.depname}
+        </title>
         <meta
           property="og:title"
-          content={"東華東課 - " + courseInfo.depname + courseInfo.subjname}
+          content={`
+            東華東課 - ${courseInfo.year + courseInfo.semester} ${
+            courseInfo.depname + courseInfo.subjname
+          }
+            `}
         />
         <meta
           name="description"
-          content={
-            courseInfo.depname + "「" + courseInfo.subjname + "」的課程資訊。"
-          }
+          content={`
+            ${courseInfo.year} 學年度 第 ${courseInfo.semester} 學期，${courseInfo.depname}「${courseInfo.subjname}」的課程資訊。`}
         />
         <meta property="og:image" content="https://i.imgur.com/d8khn37.png" />
       </Head>
@@ -47,10 +59,15 @@ export default function CourseDetailPage({ children }) {
       <div className="w-10/12 my-10 lg:w-3/4 mx-auto">
         <div>
           <div>
-            <h1 className="text-2xl">{courseInfo.subjname}</h1>
+            <h1 className="content-center flex items-stretch">
+              <span className="rounded-full bg-cyan-500/[.6] text-sm self-center mr-1.5 px-3.5 py-1 ">
+                {courseInfo.year + "-" + courseInfo.semester}
+              </span>
+              <span className="text-2xl"> {courseInfo.subjname}</span>
+            </h1>
             <p>{courseInfo.depname}</p>
           </div>
-          <div>
+          <div className="my-2">
             <Link
               href={`https://sys.ndhu.edu.tw/AA/CLASS/TeacherSubj/prt_tplan.aspx?no=${courseInfo.cid}`}
               target="_blank"
