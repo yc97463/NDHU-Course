@@ -8,7 +8,7 @@ export default function ComingSoonPage() {
   return (
     <CssVarsProvider>
       <Head>
-        <title>東課西推 Coming Soon</title>
+        <title>東課西推 The first stage</title>
         <meta property="og:image" content="https://i.imgur.com/n9E8PNr.jpg" />
       </Head>
 
