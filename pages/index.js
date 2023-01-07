@@ -3,10 +3,14 @@ import { CssVarsProvider } from "@mui/joy/styles";
 import { Alert, Divider, Link, Typography } from "@mui/joy";
 import Grid from "@mui/joy/Grid";
 import { Box } from "@mui/system";
+import Head from "next/head";
 
-export default function MyApp() {
+export default function ComingSoonPage() {
   return (
     <CssVarsProvider>
+      <Head>
+        <title>東課西推 Coming Soon</title>
+      </Head>
       <Grid
         container
         spacing={0}
@@ -16,7 +20,7 @@ export default function MyApp() {
         style={{ minHeight: "100vh" }}
       >
         <Grid item>
-          <Typography level="h1">東課西推 Comming Soon</Typography>
+          <Typography level="h1">東課西推 Coming Soon</Typography>
           <Box>
             <Divider orientation="horizontal">Any ideas?</Divider>
 
