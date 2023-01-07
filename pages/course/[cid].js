@@ -28,14 +28,14 @@ export default function CourseDetailPage({ children }) {
         </title>
       </Head>
       <div className="w-full shadow-md py-3">
-        <div className="w-3/4 mx-auto">
+        <div className="w-10/12 lg:w-3/4 mx-auto">
           <div className="text-lg font-medium">
             <Link href="/">東華東課</Link>
           </div>
         </div>
       </div>
 
-      <div className="w-3/4 mx-auto my-10">
+      <div className="w-10/12 my-10 lg:w-3/4 mx-auto">
         <div>
           <div>
             <h1 className="text-2xl">{courseInfo.subjname}</h1>
