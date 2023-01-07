@@ -24,6 +24,17 @@ export default function CourseDetailPage({ children }) {
     <div>
       <Head>
         <title>{courseInfo.subjname + " - " + courseInfo.depname}</title>
+        <meta
+          property="og:title"
+          content={"東華東課 - " + courseInfo.depname + courseInfo.subjname}
+        />
+        <meta
+          name="description"
+          content={
+            courseInfo.depname + "「" + courseInfo.subjname + "」的課程資訊。"
+          }
+        />
+        <meta property="og:image" content="https://i.imgur.com/d8khn37.png" />
       </Head>
       <div className="w-full shadow-md py-3">
         <div className="w-10/12 lg:w-3/4 mx-auto">
