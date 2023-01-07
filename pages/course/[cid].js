@@ -62,8 +62,8 @@ export default function CourseDetailPage({ children }) {
             </CopyToClipboard>
           </div>
           <div>
-            <div class="grid grid-cols-3">
-              <div className="mr-1">
+            <div class="grid grid-cols-1 md:grid-cols-3">
+              <div className="md:mr-1">
                 <div className="rounded-lg bg-slate-200 px-7 py-5 mt-2 shadow-md">
                   <h2 className="text-xl font-medium">課程資訊</h2>
                   <div>
@@ -88,7 +88,7 @@ export default function CourseDetailPage({ children }) {
                 </div>
               </div>
 
-              <div className="mx-1">
+              <div className="md:mx-1">
                 <div className="rounded-lg bg-slate-200 px-7 py-5 mt-2 shadow-md">
                   <h2 className="text-xl font-medium">上課資訊</h2>
                   <div>
@@ -112,7 +112,7 @@ export default function CourseDetailPage({ children }) {
                   <div></div>
                 </div>
               </div>
-              <div className="ml-1">
+              <div className="md:ml-1">
                 <div className="rounded-lg bg-slate-200 px-7 py-5 mt-2 shadow-md">
                   <h2 className="text-xl font-medium">課程大綱</h2>
                   <div></div>
