@@ -1,6 +1,5 @@
 import * as React from "react";
 import { CssVarsProvider } from "@mui/joy/styles";
-import Grid from "@mui/joy/Grid";
 import { Box } from "@mui/system";
 import Head from "next/head";
 
