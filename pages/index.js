@@ -10,6 +10,7 @@ export default function ComingSoonPage() {
     <CssVarsProvider>
       <Head>
         <title>東課西推 Coming Soon</title>
+        <meta property="og:image" content="https://i.imgur.com/XuaIbwv.png" />
       </Head>
       <Grid
         container
