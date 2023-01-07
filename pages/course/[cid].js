@@ -23,9 +23,7 @@ export default function CourseDetailPage({ children }) {
   return (
     <div>
       <Head>
-        <title>
-          {courseInfo.subjname} - {courseInfo.depname}
-        </title>
+        <title>{courseInfo.subjname + " - " + courseInfo.depname}</title>
       </Head>
       <div className="w-full shadow-md py-3">
         <div className="w-10/12 lg:w-3/4 mx-auto">
@@ -83,13 +81,6 @@ export default function CourseDetailPage({ children }) {
                   </div>
                 </div>
                 <div className="rounded-lg bg-slate-200 px-7 py-5 mt-2 shadow-md">
-                  <h2 className="text-xl font-medium">選課統計</h2>
-                  <div></div>
-                </div>
-              </div>
-
-              <div className="md:mx-1">
-                <div className="rounded-lg bg-slate-200 px-7 py-5 mt-2 shadow-md">
                   <h2 className="text-xl font-medium">上課資訊</h2>
                   <div>
                     <h6 className="text-sm text-cyan-500">授課老師</h6>
@@ -99,8 +90,25 @@ export default function CourseDetailPage({ children }) {
                     <h6 className="text-sm text-cyan-500">教室</h6>
                   </div>
                 </div>
+              </div>
+
+              <div className="md:mx-1">
+                <div className="rounded-lg bg-slate-200 px-7 py-5 mt-2 shadow-md">
+                  <h2 className="text-xl font-medium">課程大綱</h2>
+                  <div></div>
+                </div>
                 <div className="rounded-lg bg-slate-200 px-7 py-5 mt-2 shadow-md">
                   <h2 className="text-xl font-medium">修課資訊</h2>
+                  <div></div>
+                </div>
+                <div className="rounded-lg bg-slate-200 px-7 py-5 mt-2 shadow-md">
+                  <h2 className="text-xl font-medium">評量方式</h2>
+                  <div></div>
+                </div>
+              </div>
+              <div className="md:ml-1">
+                <div className="rounded-lg bg-slate-200 px-7 py-5 mt-2 shadow-md">
+                  <h2 className="text-xl font-medium">選課統計</h2>
                   <div></div>
                 </div>
                 <div className="rounded-lg bg-slate-200 px-7 py-5 mt-2 shadow-md">
@@ -109,16 +117,6 @@ export default function CourseDetailPage({ children }) {
                 </div>
                 <div className="rounded-lg bg-slate-200 px-7 py-5 mt-2 shadow-md">
                   <h2 className="text-xl font-medium">加簽資訊</h2>
-                  <div></div>
-                </div>
-              </div>
-              <div className="md:ml-1">
-                <div className="rounded-lg bg-slate-200 px-7 py-5 mt-2 shadow-md">
-                  <h2 className="text-xl font-medium">課程大綱</h2>
-                  <div></div>
-                </div>
-                <div className="rounded-lg bg-slate-200 px-7 py-5 mt-2 shadow-md">
-                  <h2 className="text-xl font-medium">評量方式</h2>
                   <div></div>
                 </div>
               </div>
