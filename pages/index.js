@@ -1,9 +1,9 @@
 import * as React from "react";
+import Head from "next/head";
 import { CssVarsProvider } from "@mui/joy/styles";
 import { Alert, Button, Divider, Link, Typography } from "@mui/joy";
 import Grid from "@mui/joy/Grid";
 import { Box } from "@mui/system";
-import Head from "next/head";
 
 export default function ComingSoonPage() {
   return (
@@ -26,7 +26,10 @@ export default function ComingSoonPage() {
             <Divider orientation="horizontal">Any ideas?</Divider>
 
             <Alert>
-              <Button variant="solid">Contact us</Button>&emsp;
+              <Button variant="solid" className="bg-blue-600">
+                Contact us
+              </Button>
+              &emsp;
               <Link href="mailto:ndhu-course@googlegroups.com">
                 ndhu-course@googlegroups.com
               </Link>
