@@ -60,10 +60,13 @@ export default function CourseDetailPage({ children }) {
         <div>
           <div>
             <h1 className="content-center flex items-stretch">
-              <span className="rounded-full bg-cyan-500/[.6] text-sm self-center mr-1.5 px-3.5 py-1 ">
+              <span className="rounded-full bg-cyan-500/[.6] font-bold text-sm self-center mr-1.5 px-3.5 py-1 ">
                 {courseInfo.year + "-" + courseInfo.semester}
               </span>
-              <span className="text-2xl"> {courseInfo.subjname}</span>
+              <span className="text-2xl font-semibold">
+                {" "}
+                {courseInfo.subjname}
+              </span>
             </h1>
             <p>{courseInfo.depname}</p>
           </div>
@@ -91,7 +94,9 @@ export default function CourseDetailPage({ children }) {
             <div class="grid grid-cols-1 md:grid-cols-3 md:grid-flow-row md:flex">
               <div className="w-full md:mr-1 md:w-2/6 md:flex-auto">
                 <div className="rounded-lg bg-slate-200 px-7 py-5 mt-2 shadow-md">
-                  <h2 className="text-xl font-medium">課程資訊</h2>
+                  <h2 className="text-xl font-medium font-semibold">
+                    課程資訊
+                  </h2>
                   <div>
                     <h6 className="text-sm text-cyan-500">科目名稱</h6>
                     {courseInfo.subjname}
@@ -109,7 +114,9 @@ export default function CourseDetailPage({ children }) {
                   </div>
                 </div>
                 <div className="rounded-lg bg-slate-200 px-7 py-5 mt-2 shadow-md">
-                  <h2 className="text-xl font-medium">上課資訊</h2>
+                  <h2 className="text-xl font-medium font-semibold">
+                    上課資訊
+                  </h2>
                   <div>
                     <h6 className="text-sm text-cyan-500">授課老師</h6>
                     {courseInfo._teacher + ""}
@@ -122,30 +129,42 @@ export default function CourseDetailPage({ children }) {
 
               <div className="w-full md:mx-1 md:w-3/6 md:flex-auto">
                 <div className="rounded-lg bg-slate-200 px-7 py-5 mt-2 shadow-md">
-                  <h2 className="text-xl font-medium">課程大綱</h2>
+                  <h2 className="text-xl font-medium font-semibold">
+                    課程大綱
+                  </h2>
                   <div></div>
                 </div>
                 <div className="rounded-lg bg-slate-200 px-7 py-5 mt-2 shadow-md">
-                  <h2 className="text-xl font-medium">修課資訊</h2>
+                  <h2 className="text-xl font-medium font-semibold">
+                    修課資訊
+                  </h2>
                   <div></div>
                 </div>
                 <div className="rounded-lg bg-slate-200 px-7 py-5 mt-2 shadow-md">
-                  <h2 className="text-xl font-medium">評量方式</h2>
+                  <h2 className="text-xl font-medium font-semibold">
+                    評量方式
+                  </h2>
                   <div></div>
                 </div>
               </div>
 
               <div className="w-full md:ml-1 md:w-2/6 md:flex-auto">
                 <div className="rounded-lg bg-slate-200 px-7 py-5 mt-2 shadow-md">
-                  <h2 className="text-xl font-medium">選課統計</h2>
+                  <h2 className="text-xl font-medium font-semibold">
+                    選課統計
+                  </h2>
                   <div></div>
                 </div>
                 <div className="rounded-lg bg-slate-200 px-7 py-5 mt-2 shadow-md">
-                  <h2 className="text-xl font-medium">修課評價</h2>
+                  <h2 className="text-xl font-medium font-semibold">
+                    修課評價
+                  </h2>
                   <div></div>
                 </div>
                 <div className="rounded-lg bg-slate-200 px-7 py-5 mt-2 shadow-md">
-                  <h2 className="text-xl font-medium">加簽資訊</h2>
+                  <h2 className="text-xl font-medium font-semibold">
+                    加簽資訊
+                  </h2>
                   <div></div>
                 </div>
               </div>
