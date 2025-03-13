@@ -33,14 +33,14 @@ export default function CourseList({ courses }: { courses: Course }) {
         >
             {Object.entries(courses).map(([courseId, sqlId]) => (
                 <motion.li
-                    key={sqlId}
+                    key={courseId}
                     variants={item}
                     whileHover={{ scale: 1.03 }}
                     whileTap={{ scale: 0.98 }}
                     className="bg-indigo-50 rounded-md overflow-hidden transition-all hover:shadow-md"
                 >
                     <Link
-                        href={`/course/${sqlId}`}
+                        href={`/course/${courseId}`}
                         className="block p-4 text-indigo-700 hover:bg-indigo-100 transition-colors"
                     >
                         <span className="font-medium">{courseId}</span>
