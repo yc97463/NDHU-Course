@@ -5,13 +5,23 @@ interface PageProps {
     params: Promise<{ id: string }>;
 }
 
-export async function generateStaticParams(): Promise<{ params: { id: string } }[]> {
-    const res = await fetch("https://yc97463.github.io/ndhu-course-crawler/main.json");
-    const courses = await res.json();
+export async function generateStaticParams() {
+    try {
+        const res = await fetch("https://yc97463.github.io/ndhu-course-crawler/main.json");
+        if (!res.ok) {
+            console.error('Failed to fetch course list');
+            return [];
+        }
 
-    return Object.values(courses).map((sqlNo) => ({
-        params: { id: sqlNo as string },
-    }));
+        const courses = await res.json();
+
+        return Object.values(courses).map((sqlNo) => ({
+            id: String(sqlNo)
+        }));
+    } catch (error) {
+        console.error('Error generating static params:', error);
+        return [];
+    }
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
