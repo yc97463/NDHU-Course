@@ -2,23 +2,22 @@ import { Metadata } from "next";
 import CourseDetailClient from "@/components/Course/CourseDetailClient";
 
 interface PageProps {
-    params: Promise<{ id: string }>;
+    params: { id: string };
 }
 
-export async function generateStaticParams() {
+export async function generateStaticParams(): Promise<{ params: { id: string } }[]> {
     const res = await fetch("https://yc97463.github.io/ndhu-course-crawler/main.json");
     const courses = await res.json();
 
     return Object.keys(courses).map((sqlId) => ({
-        id: sqlId,
+        params: { id: sqlId },
     }));
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-    const resolvedParams = await params;
-    if (!resolvedParams?.id) return { title: "找不到課程" };
+    if (!params?.id) return { title: "找不到課程" };
 
-    const res = await fetch(`https://yc97463.github.io/ndhu-course-crawler/course/${resolvedParams.id}.json`);
+    const res = await fetch(`https://yc97463.github.io/ndhu-course-crawler/course/${params.id}.json`);
     if (!res.ok) return { title: "找不到課程" };
 
     const course = await res.json();
@@ -30,10 +29,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function CourseDetail({ params }: PageProps) {
-    const resolvedParams = await params;
-    if (!resolvedParams?.id) return <div>找不到課程</div>;
+    if (!params?.id) return <div>找不到課程</div>;
 
-    const res = await fetch(`https://yc97463.github.io/ndhu-course-crawler/course/${resolvedParams.id}.json`, {
+    const res = await fetch(`https://yc97463.github.io/ndhu-course-crawler/course/${params.id}.json`, {
         cache: "force-cache",
     });
 
