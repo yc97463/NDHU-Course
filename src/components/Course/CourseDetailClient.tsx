@@ -1,13 +1,25 @@
 "use client";  // ✅ 告訴 Next.js 這是 Client Component
 
 import { motion } from "framer-motion";
+import {
+    Award,
+    Users,
+    Building2,
+    BookOpen,
+    Hash,
+    CalendarClock,
+    Copy,
+    Check
+} from "lucide-react";
+import { useState } from "react";
 
 interface CourseProps {
     course: {
+        english_course_name: string;
         sql_id: string;
         course_name: string;
         course_id: string;
-        credits: number;
+        credits: string;
         teacher: string[];
         classroom: string[];
         class_time: {
@@ -47,6 +59,15 @@ const courseBoxVariants = {
 };
 
 export default function CourseDetailClient({ course }: CourseProps) {
+    const [copied, setCopied] = useState(false);
+
+    const copyToClipboard = (text: string) => {
+        navigator.clipboard.writeText(text).then(() => {
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000); // Reset after 2 seconds
+        });
+    };
+
     return (
         <div className="max-w-4xl mx-auto py-8 px-4 sm:px-6">
             <motion.div
@@ -57,7 +78,7 @@ export default function CourseDetailClient({ course }: CourseProps) {
                 className="mb-8"
             >
                 <h1 className="text-3xl font-bold text-blue-800 mb-2">{course.course_name}</h1>
-                <p className="text-lg text-gray-600 mb-4">課程代碼: {course.course_id}</p>
+                <p className="text-lg text-gray-600 mb-4">{course.english_course_name}</p>
             </motion.div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -69,10 +90,102 @@ export default function CourseDetailClient({ course }: CourseProps) {
                     variants={slideIn}
                     transition={{ duration: 0.4, delay: 0.1 }}
                 >
-                    <h2 className="text-xl font-semibold text-gray-800 mb-4 border-b pb-2">基本資訊</h2>
-                    <p><strong>學分數：</strong> {course.credits}</p>
-                    <p><strong>教師：</strong> {course.teacher.join(", ")}</p>
-                    <p><strong>教室：</strong> {course.classroom.join(", ")}</p>
+                    <h2 className="text-xl font-semibold text-gray-800 mb-4 border-b pb-2 flex items-center">
+                        <BookOpen className="w-5 h-5 mr-2 text-blue-600" />
+                        基本資訊
+                    </h2>
+                    <div className="space-y-3">
+                        <div className="flex items-center p-2 bg-blue-50/50 rounded-md hover:bg-blue-50 transition-colors">
+                            <div className="mr-3 bg-blue-100 p-2 rounded-full text-blue-600 flex items-center justify-center">
+                                <Award className="h-5 w-5" />
+                            </div>
+                            <div className="flex-1">
+                                <div className="text-xs text-gray-500">學分與時數</div>
+                                <div className="font-medium flex items-center space-x-2">
+                                    <span className="inline-flex items-center bg-blue-100 text-blue-700 px-2 py-1 rounded-md">
+                                        <span className="text-xs mr-1">學分</span>
+                                        <span className="font-semibold">{course.credits.split("/")[0]}</span>
+                                    </span>
+                                    <span className="inline-flex items-center bg-indigo-100 text-indigo-700 px-2 py-1 rounded-md">
+                                        <span className="text-xs mr-1">時數</span>
+                                        <span className="font-semibold">{course.credits.split("/")[1]}</span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="flex items-center p-2 bg-blue-50/50 rounded-md hover:bg-blue-50 transition-colors">
+                            <div className="mr-3 bg-blue-100 p-2 rounded-full text-blue-600 flex items-center justify-center">
+                                <Users className="h-5 w-5" />
+                            </div>
+                            <div className="flex-1">
+                                <div className="text-xs text-gray-500">授課教師</div>
+                                <div className="font-medium">
+                                    {course.teacher.map((teacher, idx) => (
+                                        <span key={idx} className="inline-block mr-2 mb-1 px-2 py-1 bg-blue-100 text-blue-700 text-sm rounded-md">
+                                            {teacher}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="flex items-center p-2 bg-blue-50/50 rounded-md hover:bg-blue-50 transition-colors">
+                            <div className="mr-3 bg-blue-100 p-2 rounded-full text-blue-600 flex items-center justify-center">
+                                <Building2 className="h-5 w-5" />
+                            </div>
+                            <div className="flex-1">
+                                <div className="text-xs text-gray-500">上課教室</div>
+                                <div className="font-medium">
+                                    {course.classroom.map((room, idx) => (
+                                        <span key={idx} className="inline-block mr-2 mb-1 px-2 py-1 bg-blue-100 text-blue-700 text-sm rounded-md">
+                                            {room}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+
+                        <motion.div
+                            className="flex items-center p-2 bg-blue-50/50 rounded-md hover:bg-blue-50 transition-colors cursor-pointer"
+                            whileHover={{ scale: 1.01 }}
+                            whileTap={{ scale: 0.98 }}
+                            onClick={() => copyToClipboard(course.course_id)}
+                        >
+                            <div className="mr-3 bg-blue-100 p-2 rounded-full text-blue-600 flex items-center justify-center">
+                                <Hash className="h-5 w-5" />
+                            </div>
+                            <div className="flex-1">
+                                <div className="text-xs text-gray-500 flex items-center">
+                                    課程代碼
+                                    <motion.div
+                                        className="ml-1 text-xs flex items-center"
+                                        animate={copied ? { opacity: 1 } : { opacity: 0 }}
+                                    >
+                                        <span className="text-green-600 flex items-center">
+                                            <Check className="h-3 w-3 mr-1" /> 已複製
+                                        </span>
+                                    </motion.div>
+                                </div>
+                                <div className="font-medium flex items-center justify-between">
+                                    <span>{course.course_id}</span>
+                                    <motion.div
+                                        className={`text-blue-500 ${copied ? 'text-green-500' : ''}`}
+                                        animate={copied ?
+                                            { rotate: [0, 45, 0], scale: [1, 1.2, 1] } :
+                                            { opacity: 0.7 }
+                                        }
+                                        transition={{ duration: 0.3 }}
+                                    >
+                                        {copied ?
+                                            <Check className="h-4 w-4" /> :
+                                            <Copy className="h-4 w-4" />
+                                        }
+                                    </motion.div>
+                                </div>
+                            </div>
+                        </motion.div>
+                    </div>
                 </motion.div>
 
                 {/* 上課時間 */}
@@ -83,7 +196,10 @@ export default function CourseDetailClient({ course }: CourseProps) {
                     variants={slideIn}
                     transition={{ duration: 0.4, delay: 0.2 }}
                 >
-                    <h2 className="text-xl font-semibold text-gray-800 mb-4 border-b pb-2">上課時間表</h2>
+                    <h2 className="text-xl font-semibold text-gray-800 mb-4 border-b pb-2 flex items-center">
+                        <CalendarClock className="w-5 h-5 mr-2 text-blue-600" />
+                        上課時間表
+                    </h2>
                     <div className="overflow-x-auto">
                         <table className="min-w-full border-collapse bg-white rounded-lg overflow-hidden">
                             <thead>
