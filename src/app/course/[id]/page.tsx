@@ -10,7 +10,7 @@ export async function generateStaticParams() {
     return paths;
 }
 
-import CourseDetailClient from "./CourseDetailClient";
+import CourseDetailClient from "@/components/Course/CourseDetailClient";
 
 export async function generateMetadata({ params }: { params: { id: string } }) {
     const res = await fetch(`https://yc97463.github.io/ndhu-course-crawler/course/${params.id}.json`);
