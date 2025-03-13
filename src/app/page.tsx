@@ -1,4 +1,3 @@
-import CourseList from "@/components/Home/CourseList";
 import HomeClient from "@/components/Home/HomeClient";
 
 interface Course {
