@@ -2,33 +2,23 @@ import { Metadata } from "next";
 import CourseDetailClient from "@/components/Course/CourseDetailClient";
 
 interface PageProps {
-    params: { id: string };
+    params: Promise<{ id: string }>;
 }
 
-export async function generateStaticParams(): Promise<{ params: { id: string } }[]> {
-    try {
-        const res = await fetch("https://yc97463.github.io/ndhu-course-crawler/main.json");
-        if (!res.ok) {
-            console.error("❌ 無法取得 main.json");
-            return [];
-        }
+export async function generateStaticParams() {
+    const res = await fetch("https://yc97463.github.io/ndhu-course-crawler/main.json");
+    const courses = await res.json();
 
-        const courses = await res.json();
-
-        return Object.values(courses).map((sqlNo) => ({
-            params: { id: String(sqlNo) },  // ✅ 使用 `sql_no` 作為 `id`
-        }));
-    } catch (error) {
-        console.error("❌ 無法解析 main.json:", error);
-        return [];
-    }
+    return Object.keys(courses).map((sqlId) => ({
+        id: sqlId,
+    }));
 }
-
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-    if (!params?.id) return { title: "找不到課程" };
+    const resolvedParams = await params;
+    if (!resolvedParams?.id) return { title: "找不到課程" };
 
-    const res = await fetch(`https://yc97463.github.io/ndhu-course-crawler/course/${params.id}.json`);
+    const res = await fetch(`https://yc97463.github.io/ndhu-course-crawler/course/${resolvedParams.id}.json`);
     if (!res.ok) return { title: "找不到課程" };
 
     const course = await res.json();
@@ -40,15 +30,16 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function CourseDetail({ params }: PageProps) {
-    console.log("📢 取得課程 ID:", params.id);  // ✅ 確保 `id` 是 `sql_no`
+    const resolvedParams = await params;
+    if (!resolvedParams?.id) return <div>找不到課程</div>;
 
-    const res = await fetch(`https://yc97463.github.io/ndhu-course-crawler/course/${params.id}.json`);
+    const res = await fetch(`https://yc97463.github.io/ndhu-course-crawler/course/${resolvedParams.id}.json`, {
+        cache: "force-cache",
+    });
 
-    if (!res.ok) {
-        console.error("❌ 找不到課程:", params.id);
-        return <div>找不到課程</div>;
-    }
+    if (!res.ok) return <div>找不到課程</div>;
 
     const course = await res.json();
+
     return <CourseDetailClient course={course} />;
 }
