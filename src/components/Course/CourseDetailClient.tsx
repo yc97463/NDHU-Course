@@ -70,16 +70,41 @@ export default function CourseDetailClient({ course }: CourseProps) {
 
     return (
         <div className="max-w-4xl mx-auto py-8 px-4 sm:px-6">
-            <motion.div
-                initial="hidden"
-                animate="visible"
-                variants={fadeIn}
-                transition={{ duration: 0.6 }}
-                className="mb-8"
-            >
-                <h1 className="text-3xl font-bold text-blue-800 mb-2">{course.course_name}</h1>
-                <p className="text-lg text-gray-600 mb-4">{course.english_course_name}</p>
-            </motion.div>
+            <div className="flex items-center justify-between mb-8">
+                <motion.div
+                    initial="hidden"
+                    animate="visible"
+                    variants={fadeIn}
+                    transition={{ duration: 0.6 }}
+                >
+                    <h1 className="text-3xl font-bold text-blue-800 mb-2">{course.course_name}</h1>
+                    <p className="text-lg text-gray-600">{course.english_course_name}</p>
+                </motion.div>
+                <motion.div
+                    className="flex items-center space-x-2"
+                    initial="hidden"
+                    animate="visible"
+                    variants={fadeIn}
+                    transition={{ duration: 0.6, delay: 0.2 }}
+                >
+                    <motion.button
+                        onClick={() => copyToClipboard(window.location.href)}
+                        className={`flex items-center space-x-1 px-3 py-2 rounded-md transition-colors cursor-pointer ${copied ? 'bg-green-100 hover:green-200 text-green-700' : 'bg-blue-100 hover:bg-blue-200 text-blue-700'}`}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                    >
+                        {copied ? (
+                            <Check className="h-4 w-4" />
+                        ) : (
+                            <Copy className="h-4 w-4" />
+                        )}
+                        <span className="text-sm font-medium">
+                            {copied ? "已複製連結" : "複製課程連結"}
+                        </span>
+                    </motion.button>
+                </motion.div>
+
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* 基本資訊 */}
@@ -359,10 +384,10 @@ export default function CourseDetailClient({ course }: CourseProps) {
                         <span className="inline-block mr-4">* 僅顯示有課程的時段及星期</span>
                         <span className="float-right">移動滑鼠至課堂可放大檢視</span>
                     </div>
-                </motion.div>
+                </motion.div >
 
                 {/* 系所 */}
-                <motion.div
+                < motion.div
                     className="bg-white rounded-lg shadow-md p-6 border border-gray-100"
                     initial="hidden"
                     animate="visible"
@@ -377,10 +402,10 @@ export default function CourseDetailClient({ course }: CourseProps) {
                             </motion.li>
                         ))}
                     </ul>
-                </motion.div>
+                </motion.div >
 
                 {/* 課程大綱 */}
-                <motion.div
+                < motion.div
                     className="bg-white rounded-lg shadow-md p-6 border border-gray-100"
                     initial="hidden"
                     animate="visible"
@@ -406,8 +431,8 @@ export default function CourseDetailClient({ course }: CourseProps) {
                             連結至 E 學苑課堂 →
                         </motion.a>
                     </div>
-                </motion.div>
-            </div>
-        </div>
+                </motion.div >
+            </div >
+        </div >
     );
 }
