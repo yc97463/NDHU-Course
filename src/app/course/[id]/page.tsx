@@ -5,12 +5,12 @@ interface PageProps {
     params: Promise<{ id: string }>;
 }
 
-export async function generateStaticParams() {
+export async function generateStaticParams(): Promise<{ params: { id: string } }[]> {
     const res = await fetch("https://yc97463.github.io/ndhu-course-crawler/main.json");
     const courses = await res.json();
 
-    return Object.keys(courses).map((sqlId) => ({
-        id: sqlId,
+    return Object.values(courses).map((sqlNo) => ({
+        params: { id: sqlNo as string },
     }));
 }
 
