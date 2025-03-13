@@ -162,7 +162,7 @@ export default function CourseDetailClient({ course }: CourseProps) {
                             <div className="flex-1">
                                 <div className="text-xs text-gray-500">上課教室</div>
                                 <div className="font-medium">
-                                    {course.classroom.map((room, idx) => (
+                                    {[...new Set(course.classroom)].map((room, idx) => (
                                         <span key={idx} className="inline-block mr-2 mb-1 px-2 py-1 bg-blue-100 text-blue-700 text-sm rounded-md">
                                             {room}
                                         </span>
@@ -254,7 +254,7 @@ export default function CourseDetailClient({ course }: CourseProps) {
 
                                         // Create header cells - first the time period column
                                         const headers = [
-                                            <th key="period" className="border border-gray-200 px-3 py-2 text-sm font-semibold text-blue-800">
+                                            <th key="period" className="border border-gray-200 px-3 py-2 text-sm font-semibold text-blue-800 w-24">
                                                 時段
                                             </th>
                                         ];
@@ -382,7 +382,7 @@ export default function CourseDetailClient({ course }: CourseProps) {
                     </div>
                     <div className="mt-3 text-xs text-gray-500">
                         <span className="inline-block mr-4">* 僅顯示有課程的時段及星期</span>
-                        <span className="float-right">移動滑鼠至課堂可放大檢視</span>
+                        {/* <span className="float-right">移動滑鼠至課堂可放大檢視</span> */}
                     </div>
                 </motion.div >
 
@@ -394,11 +394,14 @@ export default function CourseDetailClient({ course }: CourseProps) {
                     variants={slideIn}
                     transition={{ duration: 0.4, delay: 0.3 }}
                 >
-                    <h2 className="text-xl font-semibold text-gray-800 mb-4 border-b pb-2">系所</h2>
-                    <ul>
+                    <h2 className="text-xl font-semibold text-gray-800 mb-4 border-b pb-2">開課及上課系所</h2>
+                    <ul className="space-y-2">
                         {course.departments.map((dept, index) => (
                             <motion.li key={index} className="bg-gray-50 p-2 rounded-md">
-                                {dept.college} - {dept.department}
+                                <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded-md mr-2">
+                                    {dept.college.split("::")[0]}
+                                </span>
+                                {dept.department.split("::")[0]}
                             </motion.li>
                         ))}
                     </ul>
@@ -423,7 +426,7 @@ export default function CourseDetailClient({ course }: CourseProps) {
                             查看教學計劃表 →
                         </motion.a>
                         <motion.a
-                            href={`https://elearn4.ndhu.edu.tw/gotomoodle.php?cid={course.sql_id}`}
+                            href={`https://elearn4.ndhu.edu.tw/gotomoodle.php?cid=${course.sql_id}`}
                             target="_blank"
                             className="block bg-blue-100 text-blue-700 px-4 py-2 rounded-md"
                             whileHover={{ scale: 1.03 }}
