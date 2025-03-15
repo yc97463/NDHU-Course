@@ -5,7 +5,7 @@ interface PageProps {
     params: { semester: string, id: string };
 }
 
-export async function generateStaticParams() {
+export async function generateStaticParams(): Promise<{ semester: string; id: string }[]> {
     try {
         const params: {
             semester: string;
