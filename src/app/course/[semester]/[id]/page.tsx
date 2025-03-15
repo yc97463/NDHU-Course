@@ -1,31 +1,22 @@
-import { Metadata } from "next";
+import type { Metadata } from "next";
 import CourseDetailClient from "@/components/Course/CourseDetailClient";
 
-type PageProps = {
-    params: {
-        semester: string;
-        id: string;
-    };
-    searchParams: { [key: string]: string | string[] | undefined };
-};
+interface PageProps {
+    params: Promise<{ semester: string; id: string }>;
+    searchParams?: Promise<Record<string, string | string[] | undefined>>;
+}
 
 export async function generateStaticParams(): Promise<{ semester: string; id: string }[]> {
+    const params: Array<{ semester: string; id: string }> = [];
     try {
-        const params: {
-            semester: string;
-            id: string;
-        }[] = [];
-
-        // Fetch the list of semesters
         const semestersRes = await fetch("https://yc97463.github.io/ndhu-course-crawler/semester.json");
         if (!semestersRes.ok) {
-            console.warn(`Failed to fetch semester list`);
+            console.warn("Failed to fetch semester list");
             return [];
         }
 
         const semesters = await semestersRes.json();
 
-        // For each semester, fetch its courses
         for (const semester of semesters) {
             const coursesRes = await fetch(`https://yc97463.github.io/ndhu-course-crawler/${semester}/main.json`);
             if (!coursesRes.ok) {
@@ -35,12 +26,8 @@ export async function generateStaticParams(): Promise<{ semester: string; id: st
 
             const courses = await coursesRes.json();
 
-            // Generate params for each course in this semester
             for (const courseId of Object.keys(courses)) {
-                params.push({
-                    semester,
-                    id: courseId,
-                });
+                params.push({ semester, id: courseId });
             }
         }
 
@@ -52,11 +39,10 @@ export async function generateStaticParams(): Promise<{ semester: string; id: st
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-    const { semester, id } = params;
+    const { semester, id } = await params;
     if (!semester || !id) return { title: "找不到課程" };
 
     try {
-        // Directly fetch the course details using semester and course ID
         const courseRes = await fetch(
             `https://yc97463.github.io/ndhu-course-crawler/${semester}/course/${id}.json`
         );
@@ -76,11 +62,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function CourseDetail({ params }: PageProps) {
-    const { semester, id } = params;
+    const { semester, id } = await params;
     if (!semester || !id) return <div>找不到課程</div>;
 
     try {
-        // Directly fetch the course details using semester and course ID
         const res = await fetch(
             `https://yc97463.github.io/ndhu-course-crawler/${semester}/course/${id}.json`,
             { cache: "force-cache" }
