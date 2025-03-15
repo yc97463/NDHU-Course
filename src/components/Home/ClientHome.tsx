@@ -23,11 +23,21 @@ interface SemesterData {
     courses: CourseInfo[];
 }
 
+const STORAGE_KEY = 'ndhu-course-selected-semesters';
+
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export default function ClientHome() {
     const [selectedSemesters, setSelectedSemesters] = useState<string[]>([]);
     const [semesterData, setSemesterData] = useState<SemesterData[]>([]);
+
+    // Load saved semesters from localStorage on initial render
+    useEffect(() => {
+        const savedSemesters = localStorage.getItem(STORAGE_KEY);
+        if (savedSemesters) {
+            setSelectedSemesters(JSON.parse(savedSemesters));
+        }
+    }, []);
 
     // Use SWR for individual semester course data
     const semesterResults = useSWR<{ [key: string]: CourseInfo[] }>(() => {
@@ -72,9 +82,13 @@ export default function ClientHome() {
     const handleSemesterSelect = (semester: string) => {
         setSelectedSemesters((prevSelected) => {
             // If already selected, remove it; otherwise add it
-            return prevSelected.includes(semester)
+            const newSelected = prevSelected.includes(semester)
                 ? prevSelected.filter(s => s !== semester)
                 : [...prevSelected, semester];
+
+            // Save to localStorage whenever selection changes
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(newSelected));
+            return newSelected;
         });
     };
 

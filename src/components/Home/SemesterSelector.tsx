@@ -37,9 +37,11 @@ const SemesterSelector: React.FC<SemesterSelectorProps> = ({ onSelect, selectedS
         <div className="mb-8 relative">
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="px-4 py-2 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700 transition-colors flex items-center gap-2"
+                className="px-4 py-2 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700 transition-colors flex items-center gap-2 cursor-pointer"
             >
-                <span>選擇學期</span>
+                {selectedSemesters.length === 0
+                    ? "選擇學期"
+                    : `已選擇 ${selectedSemesters.length} 學期`}
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className={`h-5 w-5 transition-transform ${isOpen ? "rotate-180" : ""}`}
@@ -73,7 +75,7 @@ const SemesterSelector: React.FC<SemesterSelectorProps> = ({ onSelect, selectedS
                                             onSelect(semester);
                                             setIsOpen(false);
                                         }}
-                                        className={`block w-full text-left px-4 py-2 hover:bg-indigo-50 rounded-md transition-colors ${selectedSemesters.includes(semester) ? "bg-indigo-100 text-indigo-700" : ""
+                                        className={`block w-full text-left px-4 py-2 hover:bg-indigo-50 rounded-md transition-colors cursor-pointer ${selectedSemesters.includes(semester) ? "bg-indigo-100 text-indigo-700" : ""
                                             }`}
                                     >
                                         {semester} 學期
