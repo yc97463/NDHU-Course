@@ -2,32 +2,42 @@ import { Metadata } from "next";
 import CourseDetailClient from "@/components/Course/CourseDetailClient";
 
 interface PageProps {
-    params: Promise<{ semester: string, id: string }>;
+    params: { semester: string, id: string };
 }
 
 export async function generateStaticParams() {
     try {
-        const semesters = ["113-2"];
         let params: {
             semester: string;
             id: string;
         }[] = [];
 
-        // Fetch course list once since we're using a single endpoint
-        const coursesRes = await fetch("https://yc97463.github.io/ndhu-course-crawler/main.json");
-        if (!coursesRes.ok) {
-            console.warn(`Failed to fetch course list`);
+        // Fetch the list of semesters
+        const semestersRes = await fetch("https://yc97463.github.io/ndhu-course-crawler/semester.json");
+        if (!semestersRes.ok) {
+            console.warn(`Failed to fetch semester list`);
             return [];
         }
 
-        const courses = await coursesRes.json();
+        const semesters = await semestersRes.json();
 
-        // Generate params for each course in the courses object
-        for (const courseCode of Object.keys(courses)) {
-            params.push({
-                semester: "113-2", // Currently hardcoded to 113-2
-                id: courseCode,
-            });
+        // For each semester, fetch its courses
+        for (const semester of semesters) {
+            const coursesRes = await fetch(`https://yc97463.github.io/ndhu-course-crawler/${semester}/main.json`);
+            if (!coursesRes.ok) {
+                console.warn(`Failed to fetch courses for semester ${semester}`);
+                continue;
+            }
+
+            const courses = await coursesRes.json();
+
+            // Generate params for each course in this semester
+            for (const courseId of Object.keys(courses)) {
+                params.push({
+                    semester,
+                    id: courseId,
+                });
+            }
         }
 
         return params;
@@ -38,59 +48,47 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-    const resolvedParams = await params;
-    if (!resolvedParams?.semester || !resolvedParams?.id) return { title: "找不到課程" };
+    const { semester, id } = params;
+    if (!semester || !id) return { title: "找不到課程" };
 
-    // 1️⃣ 先取得 courseId 對應的 sqlId
-    const coursesRes = await fetch("https://yc97463.github.io/ndhu-course-crawler/main.json");
-    if (!coursesRes.ok) return { title: "找不到課程" };
+    try {
+        // Directly fetch the course details using semester and course ID
+        const courseRes = await fetch(
+            `https://yc97463.github.io/ndhu-course-crawler/${semester}/course/${id}.json`
+        );
 
-    const courses = await coursesRes.json();
+        if (!courseRes.ok) return { title: "找不到課程" };
 
-    // 透過 courseId 找出 sqlId
-    const sqlId = courses[resolvedParams.id];  // 這裡 resolvedParams.id 是 courseId
+        const course = await courseRes.json();
 
-    if (!sqlId) return { title: "找不到課程" };
-
-    // 2️⃣ 使用 sqlId 來請求課程詳細資料
-    const courseRes = await fetch(`https://yc97463.github.io/ndhu-course-crawler/course/${sqlId}.json`);
-    if (!courseRes.ok) return { title: "找不到課程" };
-
-    const course = await courseRes.json();
-
-    return {
-        title: `${course.course_name} (${course.course_id})`,
-        description: `教師: ${course.teacher.join(", ")} - 學分數: ${course.credits}`,
-    };
+        return {
+            title: `${course.course_name} (${course.course_id})`,
+            description: `教師: ${course.teacher.join(", ")} - 學分數: ${course.credits}`,
+        };
+    } catch (error) {
+        console.error("Error generating metadata:", error);
+        return { title: "找不到課程" };
+    }
 }
 
-
 export default async function CourseDetail({ params }: PageProps) {
-    const resolvedParams = await params;
-    if (!resolvedParams?.semester || !resolvedParams?.id) return <div>找不到課程</div>;
+    const { semester, id } = params;
+    if (!semester || !id) return <div>找不到課程</div>;
 
-    // 1️⃣ 先取得 courseId 對應的 sqlId
-    const coursesRes = await fetch("https://yc97463.github.io/ndhu-course-crawler/main.json", {
-        cache: "force-cache",
-    });
+    try {
+        // Directly fetch the course details using semester and course ID
+        const res = await fetch(
+            `https://yc97463.github.io/ndhu-course-crawler/${semester}/course/${id}.json`,
+            { cache: "force-cache" }
+        );
 
-    if (!coursesRes.ok) return <div>找不到課程</div>;
+        if (!res.ok) return <div>找不到課程</div>;
 
-    const courses = await coursesRes.json();
+        const course = await res.json();
 
-    // 透過 courseId 找出 sqlId
-    const sqlId = courses[resolvedParams.id];
-
-    if (!sqlId) return <div>找不到課程</div>;
-
-    // 2️⃣ 使用 sqlId 來請求課程詳細資料
-    const res = await fetch(`https://yc97463.github.io/ndhu-course-crawler/course/${sqlId}.json`, {
-        cache: "force-cache",
-    });
-
-    if (!res.ok) return <div>找不到課程</div>;
-
-    const course = await res.json();
-
-    return <CourseDetailClient course={course} />;
+        return <CourseDetailClient course={course} />;
+    } catch (error) {
+        console.error("Error fetching course:", error);
+        return <div>載入課程時發生錯誤</div>;
+    }
 }
