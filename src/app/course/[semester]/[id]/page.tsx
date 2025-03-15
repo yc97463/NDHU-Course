@@ -7,7 +7,7 @@ interface PageProps {
 
 export async function generateStaticParams() {
     try {
-        let params: {
+        const params: {
             semester: string;
             id: string;
         }[] = [];

@@ -25,8 +25,6 @@ interface SemesterData {
 
 const STORAGE_KEY = 'ndhu-course-selected-semesters';
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
-
 export default function ClientHome() {
     const [selectedSemesters, setSelectedSemesters] = useState<string[]>([]);
     const [semesterData, setSemesterData] = useState<SemesterData[]>([]);
