@@ -1,9 +1,13 @@
 import { Metadata } from "next";
 import CourseDetailClient from "@/components/Course/CourseDetailClient";
 
-interface PageProps {
-    params: { semester: string, id: string };
-}
+type PageProps = {
+    params: {
+        semester: string;
+        id: string;
+    };
+    searchParams: { [key: string]: string | string[] | undefined };
+};
 
 export async function generateStaticParams(): Promise<{ semester: string; id: string }[]> {
     try {
