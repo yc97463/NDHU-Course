@@ -4,11 +4,18 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 
-interface Course {
-    [sqlId: string]: string;
+// Updated interface to represent course objects with ID and name
+interface CourseInfo {
+    id: string;
+    name: string;
 }
 
-export default function CourseList({ courses }: { courses: Course }) {
+interface CourseListProps {
+    courses: CourseInfo[];
+    semester: string;
+}
+
+export default function CourseList({ courses, semester }: CourseListProps) {
     const container = {
         hidden: { opacity: 0 },
         show: {
@@ -31,20 +38,20 @@ export default function CourseList({ courses }: { courses: Course }) {
             animate="show"
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
         >
-            {Object.entries(courses).map(([courseId, sqlId]) => (
+            {courses.map((course) => (
                 <motion.li
-                    key={courseId}
+                    key={`${semester}-${course.id}`} // Use a combination of semester and course ID for unique keys
                     variants={item}
                     whileHover={{ scale: 1.03 }}
                     whileTap={{ scale: 0.98 }}
                     className="bg-indigo-50 rounded-md overflow-hidden transition-all hover:shadow-md"
                 >
                     <Link
-                        href={`/course/${courseId}`}
+                        href={`/course/${semester}/${course.id}`}
                         className="block p-4 text-indigo-700 hover:bg-indigo-100 transition-colors"
                     >
-                        <span className="font-medium">{courseId}</span>
-                        <span className="text-sm text-gray-500 ml-2">({sqlId})</span>
+                        <span className="font-medium">{course.id}</span>
+                        <p className="mt-1 text-sm text-indigo-600">{course.name}</p>
                     </Link>
                 </motion.li>
             ))}

@@ -1,20 +1,55 @@
 import HomeClient from "@/components/Home/HomeClient";
 
-interface Course {
-  [sqlId: string]: string;
+interface CourseData {
+  [courseId: string]: {
+    course_id: string;
+    course_name: string;
+    // other fields from your JSON...
+  };
 }
 
 export default async function Home() {
-  // ✅ Fetch data at build-time
-  const res = await fetch("https://yc97463.github.io/ndhu-course-crawler/main.json", {
+  // Fetch list of semesters
+  const semesterRes = await fetch("https://yc97463.github.io/ndhu-course-crawler/semester.json", {
     next: { revalidate: 3600 }
   });
 
-  if (!res.ok) {
-    throw new Error("Failed to fetch course data");
+  if (!semesterRes.ok) {
+    throw new Error("Failed to fetch semester data");
   }
 
-  const courses: Course = await res.json();
+  const semesters: string[] = await semesterRes.json();
 
-  return <HomeClient courses={courses} />;
+  // Fetch course data for each semester
+  const semesterData = await Promise.all(
+    semesters.map(async (semester) => {
+      // Filter semesters based on criteria
+      if (parseInt(semester.split("-")[1]) > 2) return null;
+      if (parseInt(semester.split("-")[0]) < 105) return null;
+
+      const courseRes = await fetch(`https://yc97463.github.io/ndhu-course-crawler/${semester}/main.json`, {
+        next: { revalidate: 3600 }
+      });
+
+      if (!courseRes.ok) {
+        console.error(`Failed to fetch courses for semester ${semester}`);
+        return null;
+      }
+
+      const coursesData: CourseData = await courseRes.json();
+
+      // Transform the course data from object to array of CourseInfo objects
+      const courses = Object.entries(coursesData).map(([courseId, courseDetails]) => ({
+        id: courseId,
+        name: courseDetails.course_name || courseId // Fallback to ID if name is missing
+      }));
+
+      return { semester, courses };
+    })
+  );
+
+  // Filter out null values
+  const filteredSemesterData = semesterData.filter(item => item !== null);
+
+  return <HomeClient semesterData={filteredSemesterData} />;
 }
