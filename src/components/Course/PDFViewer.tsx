@@ -223,10 +223,11 @@ export default function PDFViewer({ url, teaching_plan_link }: PDFViewerProps) {
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.3 }}
                     >
-                        <p className="text-sm">可能原因：</p>
+                        <p className="text-sm">可能的原因：</p>
                         <ul className="list-disc pl-5 mt-2 text-sm space-y-1">
                             <li>該課程沒有上傳，或不需要上傳課程計畫表</li>
                             <li>教學計畫表不存在或已移除</li>
+                            <li>無法解析教學計畫表的檔案格式，有可能教師上傳了錯誤自編的檔案，或是非 PDF 格式</li>
                             <li>校務系統暫時的故障</li>
                         </ul>
                         <div className="mt-3 text-sm flex items-center space-x-1">
