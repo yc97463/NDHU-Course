@@ -1,13 +1,6 @@
 import { Metadata } from "next";
 import SyllabusViewerClient from "@/components/Course/SyllabusViewerClient";
 
-interface PageProps {
-    params: {
-        semester: string;
-        id: string;
-    };
-}
-
 export async function generateStaticParams(): Promise<{ semester: string; id: string }[]> {
     const params: Array<{ semester: string; id: string }> = [];
     try {
@@ -40,7 +33,13 @@ export async function generateStaticParams(): Promise<{ semester: string; id: st
     }
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata(props: {
+    params: Promise<{
+        semester: string;
+        id: string;
+    }>
+}): Promise<Metadata> {
+    const params = await props.params;
     const { semester, id } = params;
     if (!semester || !id) return { title: "找不到課程計劃表" };
 
@@ -63,7 +62,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     }
 }
 
-export default async function SyllabusPage({ params }: PageProps) {
+// In App Router for Next.js 15+, params is now a Promise
+export default async function SyllabusPage(props: {
+    params: Promise<{
+        semester: string;
+        id: string;
+    }>
+}) {
+    const params = await props.params;
     const { semester, id } = params;
     if (!semester || !id) return <div>找不到課程</div>;
 

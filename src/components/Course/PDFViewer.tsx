@@ -19,7 +19,6 @@ export default function PDFViewer({ url, teaching_plan_link }: PDFViewerProps) {
     const [error, setError] = useState<string | null>(null);
     const [workerInitialized, setWorkerInitialized] = useState(false);
     const [scale, setScale] = useState(1);
-    const [showControls, setShowControls] = useState(true);
 
     // New state variables for handling non-PDF responses
     const [nonPdfContent, setNonPdfContent] = useState<string | null>(null);
