@@ -4,8 +4,8 @@ import { useState, useEffect } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 import "react-pdf/dist/esm/Page/AnnotationLayer.css";
 import "react-pdf/dist/esm/Page/TextLayer.css";
-import { motion, AnimatePresence } from "framer-motion";
-import { FileText, AlertTriangle, ChevronUp, ChevronDown, Loader2, FileWarning, Code, Search, ExternalLink } from "lucide-react";
+import { motion, AnimatePresence } from "motion/react";
+import { FileText, AlertTriangle, FileWarning, Code, Search, ExternalLink, ArrowLeftToLine, ChevronLeft, ChevronRight, ArrowRightToLine, Cat, Rocket } from "lucide-react";
 import Link from "next/link";
 
 interface PDFViewerProps {
@@ -94,8 +94,60 @@ export default function PDFViewer({ url, teaching_plan_link }: PDFViewerProps) {
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.5 }}
             >
-                <Loader2 className="h-10 w-10 text-blue-500 animate-spin mb-4" />
-                <p className="text-gray-600 font-medium">確認教學計劃表狀態中⋯</p>
+                <div className="relative mb-6">
+                    {/* 貓咪圖標 */}
+                    <motion.div
+                        animate={{
+                            y: [-2, 2, -2],
+                            scale: [1, 1.1, 1]
+                        }}
+                        transition={{
+                            duration: 2,
+                            repeat: Infinity,
+                            ease: "easeInOut"
+                        }}
+                    >
+                        <Cat className="h-8 w-8 text-blue-500" />
+                    </motion.div>
+                </div>
+
+                {/* 文字動畫 */}
+                <motion.div
+                    className="flex items-center space-x-1"
+                    animate="visible"
+                    initial="hidden"
+                    variants={{
+                        visible: {
+                            transition: {
+                                staggerChildren: 0.1
+                            }
+                        }
+                    }}
+                >
+                    <motion.p
+                        className="text-blue-500 font-medium"
+                        animate={{
+                            opacity: [0, 1, 0],
+                        }}
+                        transition={{
+                            duration: 1.5,
+                            repeat: Infinity,
+                            ease: "easeInOut"
+                        }}
+                    >
+                        確認教學計劃表狀態中
+                    </motion.p>
+                </motion.div>
+
+                {/* 底部提示文字 */}
+                <motion.p
+                    className="text-sm text-gray-400 mt-4"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 1 }}
+                >
+                    可能需要一點時間
+                </motion.p>
             </motion.div>
         );
     }
@@ -236,7 +288,7 @@ export default function PDFViewer({ url, teaching_plan_link }: PDFViewerProps) {
                                     whileTap={{ scale: 0.9 }}
                                     disabled={currentPage === 1}
                                 >
-                                    <ChevronUp className="h-4 w-4" />
+                                    <ArrowLeftToLine className="h-4 w-4" />
                                 </motion.button>
 
                                 <motion.button
@@ -246,7 +298,7 @@ export default function PDFViewer({ url, teaching_plan_link }: PDFViewerProps) {
                                     whileTap={{ scale: 0.9 }}
                                     disabled={currentPage === 1}
                                 >
-                                    <ChevronUp className="h-5 w-5" />
+                                    <ChevronLeft className="h-5 w-5" />
                                 </motion.button>
 
                                 <div className="text-sm font-medium text-gray-700 min-w-16 text-center">
@@ -260,7 +312,7 @@ export default function PDFViewer({ url, teaching_plan_link }: PDFViewerProps) {
                                     whileTap={{ scale: 0.9 }}
                                     disabled={!numPages || currentPage === numPages}
                                 >
-                                    <ChevronDown className="h-5 w-5" />
+                                    <ChevronRight className="h-5 w-5" />
                                 </motion.button>
 
                                 <motion.button
@@ -270,7 +322,7 @@ export default function PDFViewer({ url, teaching_plan_link }: PDFViewerProps) {
                                     whileTap={{ scale: 0.9 }}
                                     disabled={!numPages || currentPage === numPages}
                                 >
-                                    <ChevronDown className="h-4 w-4" />
+                                    <ArrowRightToLine className="h-4 w-4" />
                                 </motion.button>
                             </div>
                         </motion.div>
@@ -288,13 +340,55 @@ export default function PDFViewer({ url, teaching_plan_link }: PDFViewerProps) {
                                 className="flex flex-col items-center"
                                 loading={
                                     <motion.div
-                                        className="text-center py-16"
+                                        className="flex flex-col items-center justify-center py-20"
                                         initial={{ opacity: 0 }}
                                         animate={{ opacity: 1 }}
-                                        transition={{ duration: 0.3 }}
+                                        transition={{ duration: 0.5 }}
                                     >
-                                        <Loader2 className="h-10 w-10 text-blue-500 animate-spin mx-auto mb-4" />
-                                        <p className="text-blue-500 font-medium">載入 PDF 中...</p>
+                                        <div className="relative mb-6">
+                                            {/* 火箭圖標 */}
+                                            <motion.div
+                                                animate={{
+                                                    y: [-3, 3, -3],
+                                                    scale: [1, 1.1, 1],
+                                                }}
+                                                transition={{
+                                                    duration: 2,
+                                                    repeat: Infinity,
+                                                    ease: "easeInOut"
+                                                }}
+                                            >
+                                                <Rocket className="h-8 w-8 text-blue-500 relative z-10" />
+                                            </motion.div>
+                                        </div>
+
+                                        {/* 載入文字動畫 */}
+                                        <div className="flex flex-col items-center space-y-2">
+                                            <motion.p
+                                                className="text-blue-500 font-medium flex items-center"
+                                                animate={{
+                                                    opacity: [0, 1, 0]
+                                                }}
+                                                transition={{
+                                                    duration: 1.5,
+                                                    repeat: Infinity,
+                                                    ease: "easeInOut",
+                                                    times: [0, 0.5, 1]
+                                                }}
+                                            >
+                                                載入 PDF 中
+                                            </motion.p>
+
+                                            {/* 進度提示 */}
+                                            <motion.p
+                                                className="text-sm text-gray-400"
+                                                initial={{ opacity: 0 }}
+                                                animate={{ opacity: 1 }}
+                                                transition={{ delay: 0.5 }}
+                                            >
+                                                正在準備文件內容
+                                            </motion.p>
+                                        </div>
                                     </motion.div>
                                 }
                                 error={
@@ -331,34 +425,48 @@ export default function PDFViewer({ url, teaching_plan_link }: PDFViewerProps) {
 
                         {numPages && numPages > 0 && (
                             <motion.div
-                                className="text-center text-sm text-gray-500 mt-2 mb-8 flex flex-col items-center space-y-2"
+                                className="text-center text-sm text-gray-500 mt-2 mb-8"
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 transition={{ delay: 0.5 }}
                             >
-                                <div className="flex items-center justify-center space-x-1">
-                                    <FileText className="h-4 w-4 text-blue-500 mr-1" />
-                                    <span>共 {numPages} 頁</span>
-                                </div>
+                                <div className="flex items-center justify-center space-x-4">
+                                    <div className="flex items-center space-x-1">
+                                        <FileText className="h-4 w-4 text-blue-500" />
+                                        <span>共 {numPages} 頁</span>
+                                    </div>
 
-                                <div className="flex items-center space-x-4 mt-2"></div>
-                                <motion.button
-                                    onClick={zoomOut}
-                                    className="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-700 text-sm"
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
-                                >
-                                    縮小
-                                </motion.button>
-                                <span className="text-gray-600 font-medium text-sm">{Math.round(scale * 100)}%</span>
-                                <motion.button
-                                    onClick={zoomIn}
-                                    className="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-700 text-sm"
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
-                                >
-                                    放大
-                                </motion.button>
+                                    <div className="flex items-center space-x-2 bg-gray-50 rounded-lg px-3 py-1.5 border border-gray-200">
+                                        <motion.button
+                                            onClick={zoomOut}
+                                            className="p-1.5 hover:bg-gray-200 rounded-md text-gray-700"
+                                            whileHover={{ scale: 1.05 }}
+                                            whileTap={{ scale: 0.95 }}
+                                            title="縮小"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                                            </svg>
+                                        </motion.button>
+
+                                        <span className="text-gray-600 font-medium min-w-[3.5rem]">
+                                            {Math.round(scale * 100)}%
+                                        </span>
+
+                                        <motion.button
+                                            onClick={zoomIn}
+                                            className="p-1.5 hover:bg-gray-200 rounded-md text-gray-700"
+                                            whileHover={{ scale: 1.05 }}
+                                            whileTap={{ scale: 0.95 }}
+                                            title="放大"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                                            </svg>
+                                        </motion.button>
+                                    </div>
+                                </div>
                             </motion.div>
                         )}
                     </>
