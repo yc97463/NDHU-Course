@@ -12,6 +12,8 @@ import {
     Check
 } from "lucide-react";
 import { useState } from "react";
+import { useParams } from "next/navigation";
+import Link from "next/link";
 
 interface CourseProps {
     course: {
@@ -60,6 +62,7 @@ const courseBoxVariants = {
 
 export default function CourseDetailClient({ course }: CourseProps) {
     const [copied, setCopied] = useState(false);
+    const params = useParams();
 
     const copyToClipboard = (text: string) => {
         navigator.clipboard.writeText(text).then(() => {
@@ -417,14 +420,19 @@ export default function CourseDetailClient({ course }: CourseProps) {
                 >
                     <h2 className="text-xl font-semibold text-gray-800 mb-4 border-b pb-2">相關資源</h2>
                     <div className="space-y-2">
-                        <motion.a
-                            href={course.teaching_plan_link}
-                            target="_blank"
-                            className="block bg-blue-100 text-blue-700 px-4 py-2 rounded-md"
+                        <motion.span
+                            className="block bg-blue-100 text-blue-700 rounded-md cursor-pointer"
                             whileHover={{ scale: 1.03 }}
                         >
-                            查看教學計劃表 →
-                        </motion.a>
+                            <Link href={`/course/${params.semester}/${params.id}/syllabus`} passHref>
+                                <motion.span
+                                    className="block px-4 py-2"
+                                    whileHover={{ scale: 1.03 }}
+                                >
+                                    查看教學計劃表 →
+                                </motion.span>
+                            </Link>
+                        </motion.span>
                         <motion.a
                             href={`https://elearn4.ndhu.edu.tw/gotomoodle.php?cid=${course.sql_id}`}
                             target="_blank"
