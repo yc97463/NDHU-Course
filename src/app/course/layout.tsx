@@ -10,7 +10,7 @@ export default function CourseLayout({
 }) {
     return (
         <AnimatePresence mode="wait">
-            <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white pb-10">
+            <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
                 {children}
             </div>
         </AnimatePresence>
