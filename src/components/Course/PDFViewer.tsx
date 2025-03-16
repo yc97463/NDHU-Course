@@ -283,7 +283,7 @@ export default function PDFViewer({ url, teaching_plan_link }: PDFViewerProps) {
                             <div className="bg-white/90 backdrop-blur-sm rounded-full px-4 py-2 shadow-md border border-gray-200 flex items-center space-x-3">
                                 <motion.button
                                     onClick={() => setCurrentPage(1)}
-                                    className="p-2 rounded-full hover:bg-gray-100 text-gray-700"
+                                    className="p-2 rounded-full hover:bg-gray-100 text-gray-700 cursor-pointer"
                                     whileHover={{ scale: 1.1 }}
                                     whileTap={{ scale: 0.9 }}
                                     disabled={currentPage === 1}
@@ -293,7 +293,7 @@ export default function PDFViewer({ url, teaching_plan_link }: PDFViewerProps) {
 
                                 <motion.button
                                     onClick={goToPrevPage}
-                                    className="p-2 rounded-full hover:bg-gray-100 text-gray-700"
+                                    className="p-2 rounded-full hover:bg-gray-100 text-gray-700 cursor-pointer"
                                     whileHover={{ scale: 1.1 }}
                                     whileTap={{ scale: 0.9 }}
                                     disabled={currentPage === 1}
@@ -307,7 +307,7 @@ export default function PDFViewer({ url, teaching_plan_link }: PDFViewerProps) {
 
                                 <motion.button
                                     onClick={goToNextPage}
-                                    className="p-2 rounded-full hover:bg-gray-100 text-gray-700"
+                                    className="p-2 rounded-full hover:bg-gray-100 text-gray-700 cursor-pointer"
                                     whileHover={{ scale: 1.1 }}
                                     whileTap={{ scale: 0.9 }}
                                     disabled={!numPages || currentPage === numPages}
@@ -317,7 +317,7 @@ export default function PDFViewer({ url, teaching_plan_link }: PDFViewerProps) {
 
                                 <motion.button
                                     onClick={() => numPages && setCurrentPage(numPages)}
-                                    className="p-2 rounded-full hover:bg-gray-100 text-gray-700"
+                                    className="p-2 rounded-full hover:bg-gray-100 text-gray-700 cursor-pointer"
                                     whileHover={{ scale: 1.1 }}
                                     whileTap={{ scale: 0.9 }}
                                     disabled={!numPages || currentPage === numPages}
@@ -439,7 +439,7 @@ export default function PDFViewer({ url, teaching_plan_link }: PDFViewerProps) {
                                     <div className="flex items-center space-x-2 bg-gray-50 rounded-lg px-3 py-1.5 border border-gray-200">
                                         <motion.button
                                             onClick={zoomOut}
-                                            className="p-1.5 hover:bg-gray-200 rounded-md text-gray-700"
+                                            className="p-1.5 hover:bg-gray-200 rounded-md text-gray-700 cursor-pointer"
                                             whileHover={{ scale: 1.05 }}
                                             whileTap={{ scale: 0.95 }}
                                             title="縮小"
@@ -455,7 +455,7 @@ export default function PDFViewer({ url, teaching_plan_link }: PDFViewerProps) {
 
                                         <motion.button
                                             onClick={zoomIn}
-                                            className="p-1.5 hover:bg-gray-200 rounded-md text-gray-700"
+                                            className="p-1.5 hover:bg-gray-200 rounded-md text-gray-700 cursor-pointer"
                                             whileHover={{ scale: 1.05 }}
                                             whileTap={{ scale: 0.95 }}
                                             title="放大"

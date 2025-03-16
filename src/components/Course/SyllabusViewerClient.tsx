@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { X, ArrowLeft, Book, Download } from "lucide-react";
+import { X, ArrowLeft, Book, Download, Copy, Check } from "lucide-react";
 import dynamic from "next/dynamic";
 
 // Dynamically import react-pdf to avoid SSR issues
@@ -34,9 +34,17 @@ interface SyllabusViewerClientProps {
 export default function SyllabusViewerClient({ course, semester, id }: SyllabusViewerClientProps) {
     const router = useRouter();
     const [showDownloadTooltip, setShowDownloadTooltip] = useState(false);
+    const [showCopyTooltip, setShowCopyTooltip] = useState(false);
+    const [copied, setCopied] = useState(false);
 
     const handleClose = () => {
         router.push(`/course/${semester}/${id}`);
+    };
+
+    const handleCopyLink = () => {
+        navigator.clipboard.writeText(window.location.href);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
     };
 
     const syllabus_proxy_url = `https://ndhu-course-syllabus-proxy.yccccccccccc.workers.dev/?sqlid=${course.sql_id}`;
@@ -58,7 +66,7 @@ export default function SyllabusViewerClient({ course, semester, id }: SyllabusV
                     >
                         <motion.button
                             onClick={handleClose}
-                            className="mr-4 p-2 hover:bg-gray-100 rounded-full flex items-center justify-center"
+                            className="mr-4 p-2 hover:bg-gray-100 rounded-full flex items-center justify-center cursor-pointer"
                             whileHover={{ scale: 1.1, backgroundColor: "rgba(239, 246, 255, 1)" }}
                             whileTap={{ scale: 0.9 }}
                             aria-label="返回課程頁面"
@@ -79,31 +87,71 @@ export default function SyllabusViewerClient({ course, semester, id }: SyllabusV
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ delay: 0.3 }}
-                        className="relative"
+                        className="relative flex items-center space-x-2"
                     >
-                        <motion.a
-                            href={course.teaching_plan_link}
-                            target="_blank"
-                            download={`${course.course_name}-教學計劃表.pdf`}
-                            className="p-2 hover:bg-blue-50 rounded-full flex items-center justify-center"
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.9 }}
-                            onMouseEnter={() => setShowDownloadTooltip(true)}
-                            onMouseLeave={() => setShowDownloadTooltip(false)}
-                        >
-                            <Download className="h-5 w-5 text-blue-600" />
-                        </motion.a>
-
-                        {showDownloadTooltip && (
-                            <motion.div
-                                className="absolute right-0 top-full mt-2 bg-gray-800 text-white text-xs rounded px-2 py-1 whitespace-nowrap"
-                                initial={{ opacity: 0, y: -5 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0 }}
+                        <div className="relative">
+                            <motion.button
+                                onClick={handleCopyLink}
+                                className="p-2 hover:bg-blue-50 rounded-full flex items-center justify-center"
+                                whileHover={{ scale: 1.1 }}
+                                whileTap={{ scale: 0.9 }}
+                                onMouseEnter={() => setShowCopyTooltip(true)}
+                                onMouseLeave={() => setShowCopyTooltip(false)}
                             >
-                                下載 PDF
-                            </motion.div>
-                        )}
+                                {copied ?
+                                    <Check className="h-5 w-5 text-green-600" /> :
+                                    <Copy className="h-5 w-5 text-blue-600" />
+                                }
+                            </motion.button>
+
+                            {showCopyTooltip && !copied && (
+                                <motion.div
+                                    className="absolute left-1/2 -translate-x-1/2 top-full mt-2 bg-gray-800 text-white text-xs rounded px-2 py-1 whitespace-nowrap"
+                                    initial={{ opacity: 0, y: -5 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0 }}
+                                >
+                                    複製連結
+                                </motion.div>
+                            )}
+
+                            {copied && (
+                                <motion.div
+                                    className="absolute left-1/2 -translate-x-1/2 top-full mt-2 bg-green-600 text-white text-xs rounded px-2 py-1 whitespace-nowrap"
+                                    initial={{ opacity: 0, y: -5 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0 }}
+                                >
+                                    已複製！
+                                </motion.div>
+                            )}
+                        </div>
+
+                        <div className="relative">
+                            <motion.a
+                                href={course.teaching_plan_link}
+                                target="_blank"
+                                download={`${course.course_name}-教學計劃表.pdf`}
+                                className="p-2 hover:bg-blue-50 rounded-full flex items-center justify-center"
+                                whileHover={{ scale: 1.1 }}
+                                whileTap={{ scale: 0.9 }}
+                                onMouseEnter={() => setShowDownloadTooltip(true)}
+                                onMouseLeave={() => setShowDownloadTooltip(false)}
+                            >
+                                <Download className="h-5 w-5 text-blue-600" />
+                            </motion.a>
+
+                            {showDownloadTooltip && (
+                                <motion.div
+                                    className="absolute left-1/2 -translate-x-1/2 top-full mt-2 bg-gray-800 text-white text-xs rounded px-2 py-1 whitespace-nowrap"
+                                    initial={{ opacity: 0, y: -5 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0 }}
+                                >
+                                    下載 PDF
+                                </motion.div>
+                            )}
+                        </div>
                     </motion.div>
                 </div>
             </motion.div>
@@ -118,14 +166,35 @@ export default function SyllabusViewerClient({ course, semester, id }: SyllabusV
             </motion.div>
 
             <motion.div
-                className="fixed bottom-6 right-6 z-20"
+                className="fixed bottom-6 right-6 z-20 space-y-2"
                 initial={{ opacity: 0, scale: 0 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 1, type: "spring" }}
             >
+
+                <motion.a
+                    href={course.teaching_plan_link}
+                    target="_blank"
+                    className="bg-blue-600 hover:bg-blue-700 text-white rounded-full p-3 shadow-lg flex items-center cursor-pointer"
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                >
+                    <Download className="h-5 w-5" />
+                </motion.a>
+
+                <motion.button
+                    onClick={handleCopyLink}
+                    className={`${copied ? "bg-green-600" : "bg-blue-600 hover:bg-blue-700"
+                        } text-white rounded-full p-3 shadow-lg flex items-center cursor-pointer`}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                >
+                    {copied ? <Check className="h-5 w-5" /> : <Copy className="h-5 w-5" />}
+                </motion.button>
+
                 <motion.button
                     onClick={handleClose}
-                    className="bg-blue-600 hover:bg-blue-700 text-white rounded-full p-3 shadow-lg flex items-center"
+                    className="bg-blue-600 hover:bg-blue-700 text-white rounded-full p-3 shadow-lg flex items-center cursor-pointer"
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
                 >
