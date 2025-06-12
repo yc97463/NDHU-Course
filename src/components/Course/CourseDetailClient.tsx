@@ -45,7 +45,8 @@ interface CourseProps {
 }
 
 export default function CourseDetailClient({ course }: CourseProps) {
-    const [copied, setCopied] = useState(false);
+    const [linkCopied, setLinkCopied] = useState(false);
+    const [courseIdCopied, setCourseIdCopied] = useState(false);
     const [isInSchedule, setIsInSchedule] = useState(false);
     const [isAddingToSchedule, setIsAddingToSchedule] = useState(false);
     const params = useParams();
@@ -60,10 +61,17 @@ export default function CourseDetailClient({ course }: CourseProps) {
         }
     }, [semester, course.course_id]);
 
-    const copyToClipboard = (text: string) => {
-        navigator.clipboard.writeText(text).then(() => {
-            setCopied(true);
-            setTimeout(() => setCopied(false), 2000);
+    const copyLinkToClipboard = () => {
+        navigator.clipboard.writeText(window.location.href).then(() => {
+            setLinkCopied(true);
+            setTimeout(() => setLinkCopied(false), 2000);
+        });
+    };
+
+    const copyCourseIdToClipboard = () => {
+        navigator.clipboard.writeText(course.course_id).then(() => {
+            setCourseIdCopied(true);
+            setTimeout(() => setCourseIdCopied(false), 2000);
         });
     };
 
@@ -207,20 +215,20 @@ export default function CourseDetailClient({ course }: CourseProps) {
                             </motion.button>
 
                             <motion.button
-                                onClick={() => copyToClipboard(window.location.href)}
-                                className={`inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 ${copied
+                                onClick={copyLinkToClipboard}
+                                className={`inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 ${linkCopied
                                     ? 'bg-emerald-50 text-emerald-700 border-emerald-200 focus:ring-emerald-500'
                                     : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 focus:ring-indigo-500'
                                     }`}
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
                             >
-                                {copied ? (
+                                {linkCopied ? (
                                     <Check className="w-4 h-4 mr-2" />
                                 ) : (
                                     <Copy className="w-4 h-4 mr-2" />
                                 )}
-                                {copied ? "已複製連結" : "複製課程連結"}
+                                {linkCopied ? "已複製連結" : "複製課程連結"}
                             </motion.button>
                         </div>
                     </div>
@@ -503,17 +511,33 @@ export default function CourseDetailClient({ course }: CourseProps) {
                                 <h2 className="text-lg font-semibold text-gray-900">課程代碼</h2>
                             </div>
                             <motion.div
-                                className="bg-gray-50 rounded-lg p-4 cursor-pointer hover:bg-gray-100 transition-colors"
-                                onClick={() => copyToClipboard(course.course_id)}
+                                className={`rounded-lg p-4 cursor-pointer transition-colors ${courseIdCopied
+                                    ? 'bg-emerald-50 hover:bg-emerald-100 border border-emerald-200'
+                                    : 'bg-gray-50 hover:bg-gray-100'
+                                    }`}
+                                onClick={copyCourseIdToClipboard}
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
                             >
                                 <div className="text-center">
-                                    <div className="text-xl font-mono font-bold text-gray-900 mb-1">
+                                    <div className={`text-xl font-mono font-bold mb-1 ${courseIdCopied
+                                        ? 'text-emerald-900'
+                                        : 'text-gray-900'
+                                        }`}>
                                         {course.course_id}
                                     </div>
-                                    <div className="text-xs text-gray-500">
-                                        點擊複製
+                                    <div className={`text-xs flex items-center justify-center gap-1 ${courseIdCopied
+                                        ? 'text-emerald-700'
+                                        : 'text-gray-500'
+                                        }`}>
+                                        {courseIdCopied ? (
+                                            <>
+                                                <Check className="w-3 h-3" />
+                                                已複製
+                                            </>
+                                        ) : (
+                                            "按一下複製"
+                                        )}
                                     </div>
                                 </div>
                             </motion.div>
