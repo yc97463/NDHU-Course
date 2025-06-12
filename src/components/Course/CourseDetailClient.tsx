@@ -555,7 +555,7 @@ export default function CourseDetailClient({ course }: CourseProps) {
                                 <BookOpen className="w-5 h-5 text-indigo-600" />
                                 <h2 className="text-lg font-semibold text-gray-900">相關資源</h2>
                             </div>
-                            <div className="space-y-3">
+                            <div className="flex flex-col gap-3">
                                 <Link href={`/course/${params.semester}/${params.id}/syllabus`}>
                                     <motion.div
                                         className="block bg-indigo-50 hover:bg-indigo-100 rounded-lg p-4 transition-colors cursor-pointer border border-indigo-200"
@@ -571,6 +571,23 @@ export default function CourseDetailClient({ course }: CourseProps) {
                                         </div>
                                     </motion.div>
                                 </Link>
+
+                                <motion.a
+                                    href={`https://elearn4.ndhu.edu.tw/gotomoodle.php?cid=${course.sql_id}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="block bg-emerald-50 hover:bg-emerald-100 rounded-lg p-4 transition-colors cursor-pointer border border-emerald-200"
+                                    whileHover={{ scale: 1.02 }}
+                                    whileTap={{ scale: 0.98 }}
+                                >
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <div className="font-medium text-emerald-900">E 學苑課堂</div>
+                                            <div className="text-sm text-emerald-700">連結至線上學習平台</div>
+                                        </div>
+                                        <ArrowLeft className="w-4 h-4 text-emerald-600 rotate-180" />
+                                    </div>
+                                </motion.a>
                             </div>
                         </motion.div>
                     </div>
