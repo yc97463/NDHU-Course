@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { ScheduleCourse } from "@/types/schedule";
-import { Trash2, MapPin, User, Clock } from "lucide-react";
+import { Trash2, Clock } from "lucide-react";
 import Link from "next/link";
 
 interface WeeklyScheduleProps {
