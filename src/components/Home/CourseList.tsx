@@ -1,7 +1,6 @@
-// Client component for animations
+// Client component for hover effects
 "use client";
 
-import { motion } from "framer-motion";
 import Link from "next/link";
 
 // Updated interface to represent course objects with ID and name
@@ -16,45 +15,22 @@ interface CourseListProps {
 }
 
 export default function CourseList({ courses, semester }: CourseListProps) {
-    const container = {
-        hidden: { opacity: 0 },
-        show: {
-            opacity: 1,
-            transition: {
-                staggerChildren: 0.05
-            }
-        }
-    };
-
-    const item = {
-        hidden: { opacity: 0, y: 20 },
-        show: { opacity: 1, y: 0 }
-    };
-
     return (
-        <motion.ul
-            variants={container}
-            initial="hidden"
-            animate="show"
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
-        >
+        <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {courses.map((course) => (
-                <motion.li
-                    key={`${semester}-${course.id}`} // Use a combination of semester and course ID for unique keys
-                    variants={item}
-                    whileHover={{ scale: 1.03 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="bg-indigo-50 rounded-md overflow-hidden transition-all hover:shadow-md"
+                <li
+                    key={`${semester}-${course.id}`}
+                    className="bg-indigo-50 rounded-md overflow-hidden transition-all duration-200 hover:shadow-md hover:scale-[1.02] hover:bg-indigo-100"
                 >
                     <Link
                         href={`/course/${semester}/${course.id}`}
-                        className="block p-4 text-indigo-700 hover:bg-indigo-100 transition-colors"
+                        className="block p-4 text-indigo-700 transition-colors duration-150"
                     >
                         <span className="font-medium">{course.id}</span>
                         <p className="mt-1 text-sm text-indigo-600">{course.name}</p>
                     </Link>
-                </motion.li>
+                </li>
             ))}
-        </motion.ul>
+        </ul>
     );
 }

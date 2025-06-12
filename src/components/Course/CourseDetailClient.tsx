@@ -9,11 +9,15 @@ import {
     Hash,
     CalendarClock,
     Copy,
-    Check
+    Check,
+    Plus,
+    Minus
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import { ScheduleStorage } from "@/utils/scheduleStorage";
+import { ScheduleCourse } from "@/types/schedule";
 
 interface CourseProps {
     course: {
@@ -62,13 +66,74 @@ const courseBoxVariants = {
 
 export default function CourseDetailClient({ course }: CourseProps) {
     const [copied, setCopied] = useState(false);
+    const [isInSchedule, setIsInSchedule] = useState(false);
+    const [isAddingToSchedule, setIsAddingToSchedule] = useState(false);
     const params = useParams();
+    const semester = params.semester as string;
+
+    // 檢查課程是否已在時刻表中
+    useEffect(() => {
+        if (semester && course.course_id) {
+            const inSchedule = ScheduleStorage.isCourseInSchedule(semester, course.course_id);
+            setIsInSchedule(inSchedule);
+        }
+    }, [semester, course.course_id]);
 
     const copyToClipboard = (text: string) => {
         navigator.clipboard.writeText(text).then(() => {
             setCopied(true);
             setTimeout(() => setCopied(false), 2000); // Reset after 2 seconds
         });
+    };
+
+    const handleAddToSchedule = () => {
+        if (!semester || isAddingToSchedule) return;
+
+        setIsAddingToSchedule(true);
+
+        try {
+            const scheduleCourse: ScheduleCourse = {
+                course_id: course.course_id,
+                course_name: course.course_name,
+                english_course_name: course.english_course_name,
+                teacher: course.teacher,
+                classroom: course.classroom,
+                credits: course.credits,
+                class_time: course.class_time,
+                semester: semester,
+                departments: course.departments
+            };
+
+            const success = ScheduleStorage.addCourse(semester, scheduleCourse);
+
+            if (success) {
+                setIsInSchedule(true);
+                // alert('課程已成功加入時刻表！');
+            } else {
+                // 檢查是否是時間衝突
+                const hasConflict = ScheduleStorage.checkTimeConflict(semester, scheduleCourse);
+                if (hasConflict) {
+                    alert('無法加入課程：與現有課程時間衝突！');
+                } else {
+                    alert('課程已存在於時刻表中！');
+                }
+            }
+        } catch (error) {
+            console.error('Error adding course to schedule:', error);
+            alert('加入課程時發生錯誤，請稍後再試。');
+        } finally {
+            setIsAddingToSchedule(false);
+        }
+    };
+
+    const handleRemoveFromSchedule = () => {
+        if (!semester) return;
+
+        // if (confirm('確定要從時刻表中移除這門課程嗎？')) {
+        //     alert('課程已從時刻表中移除！');
+        // }
+        ScheduleStorage.removeCourse(semester, course.course_id);
+        setIsInSchedule(false);
     };
 
     return (
@@ -90,6 +155,34 @@ export default function CourseDetailClient({ course }: CourseProps) {
                     variants={fadeIn}
                     transition={{ duration: 0.6, delay: 0.2 }}
                 >
+                    {/* 時刻表按鈕 */}
+                    <motion.button
+                        onClick={isInSchedule ? handleRemoveFromSchedule : handleAddToSchedule}
+                        disabled={isAddingToSchedule}
+                        className={`flex items-center space-x-1 px-3 py-2 rounded-md transition-colors cursor-pointer ${isInSchedule
+                            ? 'bg-red-100 hover:bg-red-200 text-red-700'
+                            : 'bg-green-100 hover:bg-green-200 text-green-700'
+                            } ${isAddingToSchedule ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        whileHover={!isAddingToSchedule ? { scale: 1.05 } : {}}
+                        whileTap={!isAddingToSchedule ? { scale: 0.95 } : {}}
+                    >
+                        {isAddingToSchedule ? (
+                            <div className="animate-spin w-4 h-4 border-2 border-green-600 border-t-transparent rounded-full" />
+                        ) : isInSchedule ? (
+                            <Minus className="h-4 w-4" />
+                        ) : (
+                            <Plus className="h-4 w-4" />
+                        )}
+                        <span className="text-sm font-medium">
+                            {isAddingToSchedule
+                                ? "處理中..."
+                                : isInSchedule
+                                    ? "從時刻表移除"
+                                    : "加入時刻表"
+                            }
+                        </span>
+                    </motion.button>
+
                     <motion.button
                         onClick={() => copyToClipboard(window.location.href)}
                         className={`flex items-center space-x-1 px-3 py-2 rounded-md transition-colors cursor-pointer ${copied ? 'bg-green-100 hover:green-200 text-green-700' : 'bg-blue-100 hover:bg-blue-200 text-blue-700'}`}
