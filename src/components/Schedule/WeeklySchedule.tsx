@@ -60,23 +60,73 @@ export default function WeeklySchedule({ courses, semester, onRemoveCourse }: We
         });
     });
 
+    // 建立合併課程的資料結構
+    const mergedCourses: { [day: string]: { [period: number]: { course: ScheduleCourse; rowSpan: number; isHidden: boolean } } } = {};
+
+    days.forEach(day => {
+        mergedCourses[day.key] = {};
+
+        let i = 0;
+        while (i < timeSlots.length) {
+            const currentPeriod = timeSlots[i].period;
+            const course = scheduleGrid[day.key][currentPeriod];
+
+            if (course) {
+                // 檢查連續的課程
+                let consecutiveCount = 1;
+                let j = i + 1;
+
+                while (j < timeSlots.length) {
+                    const nextPeriod = timeSlots[j].period;
+                    const nextCourse = scheduleGrid[day.key][nextPeriod];
+
+                    if (nextCourse && nextCourse.course_id === course.course_id) {
+                        consecutiveCount++;
+                        j++;
+                    } else {
+                        break;
+                    }
+                }
+
+                // 設定第一個格子的 rowSpan，其他格子標記為隱藏
+                mergedCourses[day.key][currentPeriod] = {
+                    course,
+                    rowSpan: consecutiveCount,
+                    isHidden: false
+                };
+
+                // 標記後續連續格子為隱藏
+                for (let k = 1; k < consecutiveCount; k++) {
+                    const hiddenPeriod = timeSlots[i + k].period;
+                    mergedCourses[day.key][hiddenPeriod] = {
+                        course,
+                        rowSpan: 1,
+                        isHidden: true
+                    };
+                }
+
+                i += consecutiveCount;
+            } else {
+                i++;
+            }
+        }
+    });
+
     // 使用完整的時段和星期（週一到週五，第1-16節）
     const filteredTimeSlots = timeSlots; // 顯示所有時段
     const filteredDays = days; // 顯示週一到週五
 
-    // 移除空課表的特殊處理，讓它顯示完整的空時刻表
-
     return (
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200/50 overflow-hidden">
             {/* 表格標題 */}
-            <div className="bg-gradient-to-r from-indigo-50 to-purple-50 px-6 py-4 border-b border-gray-100">
+            <div className="bg-indigo-50 px-6 py-4 border-b border-gray-200">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
                         <Clock className="w-5 h-5 text-indigo-600" />
                         <h3 className="text-lg font-semibold text-gray-900">週課表</h3>
                     </div>
                     {courses.length > 0 && (
-                        <div className="text-sm text-gray-600">
+                        <div className="text-sm text-indigo-700 font-medium">
                             共 {courses.length} 門課程
                         </div>
                     )}
@@ -85,65 +135,64 @@ export default function WeeklySchedule({ courses, semester, onRemoveCourse }: We
 
             {/* 時刻表 */}
             <div className="overflow-x-auto">
-                <table className="min-w-full">
+                <table className="min-w-full border-collapse bg-white rounded-lg overflow-hidden">
                     <thead>
-                        <tr className="bg-gray-50 border-b border-gray-200">
-                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider w-24">
+                        <tr className="bg-indigo-50">
+                            <th className="border border-gray-200 px-3 py-2 text-sm font-semibold text-indigo-800 w-24">
                                 時段
                             </th>
                             {filteredDays.map(day => (
-                                <th key={day.key} className="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider min-w-[160px]">
+                                <th key={day.key} className="border border-gray-200 px-3 py-2 text-sm font-semibold text-indigo-800 min-w-[160px]">
                                     {day.name}
                                 </th>
                             ))}
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-100">
+                    <tbody>
                         {filteredTimeSlots.map(slot => (
-                            <tr key={slot.period} className="hover:bg-gray-50/50 transition-colors">
-                                <td className="px-4 py-4 bg-gray-50/50 border-r border-gray-100">
-                                    <div className="text-center">
-                                        <div className="text-sm font-semibold text-gray-900">{slot.period}</div>
-                                        <div className="text-xs text-gray-500 mt-1">{slot.time}</div>
-                                    </div>
+                            <tr key={slot.period} className="bg-gray-50/30">
+                                <td className="border border-gray-200 px-2 py-1 bg-indigo-50/50 text-center">
+                                    <span className="font-medium text-sm">{slot.period}</span>
+                                    <div className="text-xs text-gray-500 mt-1">{slot.time}</div>
                                 </td>
                                 {filteredDays.map(day => {
-                                    const course = scheduleGrid[day.key][slot.period];
+                                    const mergedCourse = mergedCourses[day.key][slot.period];
+
+                                    // 如果這個格子被標記為隱藏（因為被合併了），就不渲染
+                                    if (mergedCourse?.isHidden) {
+                                        return null;
+                                    }
 
                                     return (
-                                        <td key={day.key} className="px-2 py-2 align-top h-24 border-r border-gray-100 last:border-r-0">
-                                            {course ? (
+                                        <td
+                                            key={day.key}
+                                            className="border border-gray-200 px-1 py-2 text-center align-middle relative"
+                                            rowSpan={mergedCourse?.rowSpan || 1}
+                                            style={{ height: mergedCourse?.rowSpan ? `${mergedCourse.rowSpan * 4}rem` : '4rem' }}
+                                        >
+                                            {mergedCourse?.course ? (
                                                 <motion.div
-                                                    className="h-full w-full bg-gradient-to-br from-indigo-50 to-indigo-100 border border-indigo-200 rounded-lg p-3 relative group cursor-pointer hover:shadow-sm transition-all duration-200"
+                                                    className="flex flex-col items-center justify-center h-full w-full absolute top-0 left-0 p-2 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 cursor-pointer rounded-lg group transition-colors"
                                                     whileHover={{ scale: 1.02 }}
+                                                    whileTap={{ scale: 0.98 }}
                                                     transition={{ duration: 0.2 }}
                                                 >
-                                                    <Link href={`/course/${semester}/${course.course_id}`}>
-                                                        <div className="h-full flex flex-col justify-between">
-                                                            <div>
-                                                                <div className="font-medium text-indigo-900 text-xs leading-tight mb-2">
-                                                                    {course.course_name.length > 14
-                                                                        ? course.course_name.substring(0, 14) + '...'
-                                                                        : course.course_name}
-                                                                </div>
-                                                                <div className="space-y-1">
-                                                                    <div className="flex items-center text-xs text-indigo-700">
-                                                                        <User className="w-3 h-3 mr-1 flex-shrink-0" />
-                                                                        <span className="truncate">
-                                                                            {course.teacher.join(', ')}
-                                                                        </span>
-                                                                    </div>
-                                                                    {course.classroom.length > 0 && (
-                                                                        <div className="flex items-center text-xs text-indigo-700">
-                                                                            <MapPin className="w-3 h-3 mr-1 flex-shrink-0" />
-                                                                            <span className="truncate">
-                                                                                {course.classroom[0]}
-                                                                            </span>
-                                                                        </div>
-                                                                    )}
-                                                                </div>
-                                                            </div>
+                                                    <Link href={`/course/${semester}/${mergedCourse.course.course_id}`} className="w-full h-full flex flex-col items-center justify-center">
+                                                        <div className="font-medium text-indigo-900 text-sm text-center leading-tight">
+                                                            {mergedCourse.course.course_name.length > (mergedCourse.rowSpan > 1 ? 20 : 10)
+                                                                ? mergedCourse.course.course_name.substring(0, mergedCourse.rowSpan > 1 ? 20 : 10) + '...'
+                                                                : mergedCourse.course.course_name}
                                                         </div>
+                                                        {mergedCourse.course.classroom.length > 0 && (
+                                                            <div className="text-xs text-indigo-700 mt-1">
+                                                                {mergedCourse.course.classroom[0]}
+                                                            </div>
+                                                        )}
+                                                        {mergedCourse.rowSpan > 1 && (
+                                                            <div className="text-xs text-indigo-600 mt-1 opacity-75">
+                                                                {mergedCourse.rowSpan} 節連堂
+                                                            </div>
+                                                        )}
                                                     </Link>
 
                                                     {/* 移除按鈕 */}
@@ -151,9 +200,9 @@ export default function WeeklySchedule({ courses, semester, onRemoveCourse }: We
                                                         onClick={(e) => {
                                                             e.preventDefault();
                                                             e.stopPropagation();
-                                                            onRemoveCourse(course.course_id);
+                                                            onRemoveCourse(mergedCourse.course.course_id);
                                                         }}
-                                                        className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-red-600 shadow-sm"
+                                                        className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-red-600 shadow-sm z-10"
                                                         whileHover={{ scale: 1.1 }}
                                                         whileTap={{ scale: 0.9 }}
                                                     >
@@ -161,7 +210,7 @@ export default function WeeklySchedule({ courses, semester, onRemoveCourse }: We
                                                     </motion.button>
                                                 </motion.div>
                                             ) : (
-                                                <div className="h-full w-full flex items-center justify-center text-gray-200 hover:bg-gray-50 transition-colors rounded-lg group">
+                                                <div className="h-full w-full flex items-center justify-center text-gray-300 hover:bg-gray-50 transition-colors rounded-sm group">
                                                     <div className="text-xs opacity-0 group-hover:opacity-50 transition-opacity">
                                                         空堂
                                                     </div>
@@ -177,10 +226,10 @@ export default function WeeklySchedule({ courses, semester, onRemoveCourse }: We
             </div>
 
             {/* 課程統計 */}
-            <div className="bg-gray-50 px-6 py-4 border-t border-gray-100">
+            <div className="bg-indigo-50/50 px-6 py-4 border-t border-gray-200">
                 <div className="flex justify-between items-center text-sm">
-                    <div className="flex items-center space-x-4 text-gray-600">
-                        <span>共 {courses.length} 門課程</span>
+                    <div className="flex items-center space-x-4 text-gray-700">
+                        <span className="font-medium">共 {courses.length} 門課程</span>
                         <span>
                             總學分：{courses.reduce((total, course) => {
                                 const credits = parseFloat(course.credits.split('/')[0]) || 0;
@@ -190,7 +239,7 @@ export default function WeeklySchedule({ courses, semester, onRemoveCourse }: We
                     </div>
                     {courses.length > 0 && (
                         <div className="text-xs text-gray-500">
-                            滑鼠移到課程上可進行操作
+                            * 僅顯示週一至週五，第1-16節
                         </div>
                     )}
                 </div>
