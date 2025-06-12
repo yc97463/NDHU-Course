@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
-import { Home, Calendar, BookOpen } from "lucide-react";
+import { BookOpen, Calendar, Sparkles } from "lucide-react";
 
 export default function Navbar() {
     const pathname = usePathname();
@@ -24,43 +24,50 @@ export default function Navbar() {
     ];
 
     return (
-        <nav className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+        <nav className="bg-white/80 backdrop-blur-md border-b border-gray-200/50 sticky top-0 z-50">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center h-16">
                     {/* Logo */}
-                    <Link href="/" className="flex items-center space-x-2">
+                    <Link href="/" className="flex items-center space-x-3">
                         <motion.div
                             whileHover={{ scale: 1.05 }}
-                            className="flex items-center space-x-2"
+                            whileTap={{ scale: 0.95 }}
+                            className="flex items-center space-x-3"
                         >
-                            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
-                                <Home className="w-5 h-5 text-white" />
+                            <div className="relative">
+                                <div className="w-9 h-9 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
+                                    <Sparkles className="w-5 h-5 text-white" />
+                                </div>
+                                <div className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-400 rounded-full animate-pulse"></div>
                             </div>
-                            <span className="text-xl font-bold text-gray-800">NDHU 課程</span>
+                            <div className="flex flex-col">
+                                <span className="text-lg font-bold text-gray-900">NDHU Course</span>
+                                <span className="text-xs text-gray-500 -mt-1">東華課程系統</span>
+                            </div>
                         </motion.div>
                     </Link>
 
                     {/* Navigation Links */}
-                    <div className="flex space-x-1">
+                    <div className="flex items-center space-x-2">
                         {navItems.map((item) => {
                             const Icon = item.icon;
                             return (
                                 <Link key={item.href} href={item.href}>
                                     <motion.div
-                                        className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors relative ${item.active
-                                                ? "bg-blue-100 text-blue-700"
-                                                : "text-gray-600 hover:bg-gray-100 hover:text-gray-800"
+                                        className={`relative flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-200 ${item.active
+                                                ? "bg-indigo-50 text-indigo-700 shadow-sm"
+                                                : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                                             }`}
                                         whileHover={{ scale: 1.02 }}
                                         whileTap={{ scale: 0.98 }}
                                     >
-                                        <Icon className="w-4 h-4" />
+                                        <Icon className={`w-4 h-4 ${item.active ? 'text-indigo-600' : ''}`} />
                                         <span className="text-sm font-medium">{item.label}</span>
 
                                         {item.active && (
                                             <motion.div
-                                                className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 rounded-full"
-                                                layoutId="activeTab"
+                                                className="absolute inset-0 bg-indigo-100/50 rounded-xl -z-10"
+                                                layoutId="activeNavBg"
                                                 initial={false}
                                                 transition={{ type: "spring", stiffness: 500, damping: 30 }}
                                             />
