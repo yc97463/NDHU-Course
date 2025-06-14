@@ -1,17 +1,10 @@
 import { Suspense } from "react";
 import ScheduleClient from "@/components/Schedule/ScheduleClient";
 import ScheduleOperations from "@/components/Schedule/ScheduleOperations";
+import { SharePageProps } from "@/utils/types";
 
-interface PageProps {
-    searchParams: {
-        name?: string;
-        semester?: string;
-        courses?: string;
-    };
-}
-
-export default function SharedSchedulePage({ searchParams }: PageProps) {
-    const { name, semester, courses } = searchParams;
+export default async function SharedSchedulePage({ searchParams }: SharePageProps) {
+    const { name, semester, courses } = await searchParams;
 
     // 檢查必要參數
     if (!name || !semester || !courses) {
@@ -38,6 +31,7 @@ export default function SharedSchedulePage({ searchParams }: PageProps) {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                     <div className="text-center py-16">
                         <p className="text-gray-600 font-medium">無效的分享連結</p>
+                        <p className="text-gray-500">{String(error)}</p>
                     </div>
                 </div>
             </div>

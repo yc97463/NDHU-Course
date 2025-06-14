@@ -41,7 +41,7 @@ export default function ScheduleOperations({ name, semester, courses }: Schedule
                     teacher: Array.isArray(course.teacher) ? course.teacher : [course.teacher],
                     classroom: Array.isArray(course.classroom) ? course.classroom : [course.classroom],
                     credits: course.credits?.toString() || '',
-                    class_time: course.class_time.map((time: any) => ({
+                    class_time: course.class_time.map((time: { day: string; period: string }) => ({
                         day: time.day?.toString() || '',
                         period: time.period?.toString() || ''
                     })),
