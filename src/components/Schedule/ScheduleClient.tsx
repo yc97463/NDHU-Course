@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import useSWR from "swr";
 import { ScheduleStorage } from "@/utils/scheduleStorage";
 import { ScheduleCourse } from "@/types/schedule";
 import WeeklySchedule from "./WeeklySchedule";
@@ -9,12 +10,16 @@ import SemesterScheduleSelector from "./SemesterScheduleSelector";
 import { Calendar, Trash2, RefreshCw, BookOpen, Share2, Copy, Pencil } from "lucide-react";
 
 const USER_NAME_STORAGE_KEY = 'ndhu-course-user-name';
+const SELECTED_SEMESTER_STORAGE_KEY = 'ndhu-course-selected-semester';
 
 interface ScheduleClientProps {
     sharedName?: string;
     sharedSemester?: string;
     sharedCourseIds?: string[];
 }
+
+// 定義 fetcher 函數
+const fetcher = (url: string) => fetch(url).then(res => res.json());
 
 export default function ScheduleClient({
     sharedName,
@@ -30,31 +35,190 @@ export default function ScheduleClient({
     const [isSharedView, setIsSharedView] = useState(false);
     const [isEditingName, setIsEditingName] = useState(false);
 
-    // 從 API 獲取課程資料
-    const fetchCourseData = async (courseIds: string[]) => {
+    // 處理學期變更
+    const onSemesterChange = (semester: string) => {
+        console.log('Semester changed to:', semester);
+        setSelectedSemester(semester);
+        // 儲存選擇的學期到 localStorage
+        localStorage.setItem(SELECTED_SEMESTER_STORAGE_KEY, semester);
+        // 清空當前課程
+        setCourses([]);
+        // 重新載入該學期的課程
+        loadScheduleData();
+    };
+
+    // 載入課表資料
+    const loadScheduleData = async () => {
+        console.log('Loading schedule data for semester:', selectedSemester);
+        if (!selectedSemester) {
+            setIsLoading(false);
+            return;
+        }
+
         try {
-            const coursePromises = courseIds.map(async (courseId) => {
-                const response = await fetch(`/api/course/${selectedSemester}/${courseId}`);
-                if (!response.ok) throw new Error('Failed to fetch course data');
-                return response.json();
-            });
-            const courseData = await Promise.all(coursePromises);
-            setCourses(courseData);
+            setIsLoading(true);
+            // 從 localStorage 讀取該學期的課程資料
+            const storedData = localStorage.getItem(`schedule_${selectedSemester}`);
+            if (storedData) {
+                const parsedData = JSON.parse(storedData);
+                console.log('Loaded stored data:', parsedData);
+                setCourses(parsedData);
+            } else {
+                console.log('No stored data found for semester:', selectedSemester);
+                setCourses([]);
+            }
         } catch (error) {
-            console.error('Error fetching course data:', error);
+            console.error('Error loading schedule data:', error);
+            setCourses([]);
+        } finally {
+            console.log('Finished loading schedule data');
+            setIsLoading(false);
         }
     };
 
-    // 載入資料
+    // 當學期改變時重新載入資料
+    useEffect(() => {
+        console.log('Semester changed, reloading data:', selectedSemester);
+        if (selectedSemester && !isSharedView) {
+            loadScheduleData();
+        }
+    }, [selectedSemester, isSharedView]);
+
+    // 初始化時載入可用學期
+    useEffect(() => {
+        console.log('Loading available semesters');
+        try {
+            const semesters = ScheduleStorage.getAvailableSemesters();
+            console.log('Available semesters:', semesters);
+            setAvailableSemesters(semesters);
+
+            // 從 localStorage 讀取上次選擇的學期
+            const storedSemester = localStorage.getItem(SELECTED_SEMESTER_STORAGE_KEY);
+
+            if (storedSemester && semesters.includes(storedSemester)) {
+                // 如果儲存的學期存在於可用學期中，使用它
+                console.log('Using stored semester:', storedSemester);
+                setSelectedSemester(storedSemester);
+            } else if (semesters.length > 0) {
+                // 否則使用最新的學期
+                const sortedSemesters = [...semesters].sort((a, b) => {
+                    const [yearA, termA] = a.split("-").map(Number);
+                    const [yearB, termB] = b.split("-").map(Number);
+                    return yearB === yearA ? termB - termA : yearB - yearA;
+                });
+                console.log('Setting selected semester:', sortedSemesters[0]);
+                setSelectedSemester(sortedSemesters[0]);
+            }
+        } catch (error) {
+            console.error("Error loading available semesters:", error);
+        }
+    }, []);
+
+    // 使用 SWR 獲取課程資料
+    const { data: courseData, error: courseError, isLoading: isCourseLoading } = useSWR(
+        selectedSemester && courses.length > 0 && isSharedView
+            ? courses.map(course => `https://yc97463.github.io/ndhu-course-crawler/${selectedSemester}/course/${course.course_id}.json`)
+            : null,
+        (urls) => Promise.all(urls.map(url => fetcher(url))),
+        {
+            revalidateOnFocus: false,
+            revalidateOnReconnect: false,
+            dedupingInterval: 60000, // 1分鐘內不重複請求
+        }
+    );
+
+    // 轉換課程資料格式
+    const transformCourseData = (data: any[]): ScheduleCourse[] => {
+        return data.map(course => {
+            // 確保 class_time 是正確的格式
+            const classTime = course.class_time || [];
+            const formattedClassTime = classTime.map((time: any) => {
+                if (typeof time === 'object' && time !== null) {
+                    // 如果是物件格式，確保有 day 和 period
+                    return {
+                        day: time.day?.toString() || '',
+                        period: time.period?.toString() || ''
+                    };
+                } else if (typeof time === 'string') {
+                    // 如果是字串格式，解析成物件
+                    const [day, period] = time.split('-');
+                    return {
+                        day: day || '',
+                        period: period || ''
+                    };
+                }
+                return time;
+            });
+
+            console.log('Original class_time:', classTime);
+            console.log('Formatted class_time:', formattedClassTime);
+
+            return {
+                course_id: course.course_id,
+                course_name: course.course_name,
+                english_course_name: course.english_course_name || '',
+                teacher: Array.isArray(course.teacher) ? course.teacher : [course.teacher],
+                classroom: Array.isArray(course.classroom) ? course.classroom : [course.classroom],
+                credits: course.credits?.toString() || '',
+                class_time: formattedClassTime,
+                semester: course.semester || selectedSemester,
+                departments: course.departments || []
+            };
+        });
+    };
+
+    // 初始化共享視圖
     useEffect(() => {
         if (sharedName && sharedSemester && sharedCourseIds) {
-            // 共享視圖模式
+            console.log('Initializing shared view with:', { sharedName, sharedSemester, sharedCourseIds });
             setUserName(sharedName);
             setSelectedSemester(sharedSemester);
             setIsSharedView(true);
-            fetchCourseData(sharedCourseIds);
-        } else {
-            // 一般視圖模式
+            // 初始化課程資料，只包含必要的 ID 信息
+            const initialCourses = sharedCourseIds.map(id => ({
+                course_id: id,
+                course_name: '',
+                english_course_name: '',
+                teacher: [],
+                classroom: [],
+                credits: '',
+                class_time: [],
+                semester: sharedSemester,
+                departments: []
+            }));
+            console.log('Setting initial courses:', initialCourses);
+            setCourses(initialCourses);
+        }
+    }, [sharedName, sharedSemester, sharedCourseIds]);
+
+    // 當課程資料更新時更新狀態
+    useEffect(() => {
+        console.log('Course data updated:', courseData);
+        if (courseData && isSharedView) {
+            // 檢查原始資料格式
+            courseData.forEach((course, index) => {
+                console.log(`Original course ${index} data:`, {
+                    course_id: course.course_id,
+                    course_name: course.course_name,
+                    class_time: course.class_time
+                });
+            });
+
+            const transformedData = transformCourseData(courseData);
+            console.log('Transformed course data:', transformedData);
+            // 檢查 class_time 格式
+            transformedData.forEach(course => {
+                console.log(`Course ${course.course_name} class_time:`, course.class_time);
+            });
+            setCourses(transformedData);
+            setIsLoading(false);
+        }
+    }, [courseData, isSharedView]);
+
+    // 載入一般視圖資料
+    useEffect(() => {
+        if (!isSharedView) {
+            console.log('Loading normal view');
             loadScheduleData();
             // 從 localStorage 讀取使用者名稱
             const storedName = localStorage.getItem(USER_NAME_STORAGE_KEY);
@@ -62,44 +226,20 @@ export default function ScheduleClient({
                 setUserName(storedName);
             }
         }
-    }, [sharedName, sharedSemester, sharedCourseIds]);
+    }, [isSharedView]);
+
+    // 當選擇的學期改變時載入該學期的課程
+    useEffect(() => {
+        if (selectedSemester && !isSharedView) {
+            const semesterCourses = ScheduleStorage.getSemesterCourses(selectedSemester);
+            setCourses(semesterCourses);
+        }
+    }, [selectedSemester, isSharedView]);
 
     // 儲存使用者名稱到 localStorage
     const saveUserName = (name: string) => {
         setUserName(name);
         localStorage.setItem(USER_NAME_STORAGE_KEY, name);
-    };
-
-    // 當選擇的學期改變時載入該學期的課程
-    useEffect(() => {
-        if (selectedSemester) {
-            const semesterCourses = ScheduleStorage.getSemesterCourses(selectedSemester);
-            setCourses(semesterCourses);
-        } else {
-            setCourses([]);
-        }
-    }, [selectedSemester]);
-
-    const loadScheduleData = () => {
-        setIsLoading(true);
-        try {
-            const semesters = ScheduleStorage.getAvailableSemesters();
-            setAvailableSemesters(semesters);
-
-            // 如果有學期資料，預設選擇最新的學期
-            if (semesters.length > 0) {
-                const sortedSemesters = [...semesters].sort((a, b) => {
-                    const [yearA, termA] = a.split("-").map(Number);
-                    const [yearB, termB] = b.split("-").map(Number);
-                    return yearB === yearA ? termB - termA : yearB - yearA;
-                });
-                setSelectedSemester(sortedSemesters[0]);
-            }
-        } catch (error) {
-            console.error("Error loading schedule data:", error);
-        } finally {
-            setIsLoading(false);
-        }
     };
 
     const handleRemoveCourse = (courseId: string) => {
@@ -149,7 +289,7 @@ export default function ScheduleClient({
         // 生成分享連結
         const baseUrl = window.location.origin;
         const encodedName = btoa(encodeURIComponent(userName || 'anonymous')).replace(/=/g, '');
-        return `${baseUrl}/schedule/${encodedName}/${selectedSemester}/${courseIds}`;
+        return `${baseUrl}/schedule/share?name=${encodedName}&semester=${selectedSemester}&courses=${courseIds}`;
     };
 
     const handleCopyLink = async () => {
@@ -165,7 +305,8 @@ export default function ScheduleClient({
         }
     };
 
-    if (isLoading) {
+    if (isLoading || isCourseLoading) {
+        console.log('Rendering loading state', { isLoading, isCourseLoading });
         return (
             <div className="min-h-screen bg-gray-50">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -179,6 +320,14 @@ export default function ScheduleClient({
             </div>
         );
     }
+
+    console.log('Rendering main view with state:', {
+        isSharedView,
+        selectedSemester,
+        courses: courses.length,
+        userName,
+        isLoading
+    });
 
     return (
         <div className="min-h-screen bg-gray-50">
@@ -245,7 +394,7 @@ export default function ScheduleClient({
                                     <SemesterScheduleSelector
                                         availableSemesters={availableSemesters}
                                         selectedSemester={selectedSemester}
-                                        onSemesterChange={setSelectedSemester}
+                                        onSemesterChange={onSemesterChange}
                                     />
                                 </div>
 
