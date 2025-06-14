@@ -1,15 +1,58 @@
-import { Suspense } from "react";
+// page.tsx - 客戶端渲染版本
+'use client';
+
+import { Suspense, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import ScheduleClient from "@/components/Schedule/ScheduleClient";
 import ScheduleOperations from "@/components/Schedule/ScheduleOperations";
-import { SharePageProps, SharePageSearchParams } from "@/utils/types";
 
-export default async function SharedSchedulePage({ searchParams }: SharePageProps) {
-    // Await the searchParams promise
-    const params = await searchParams;
-    const { name, semester, courses } = params as SharePageSearchParams;
+// 把使用 useSearchParams 的邏輯分離到獨立的組件中
+function SharedScheduleContent() {
+    const searchParams = useSearchParams();
+    const [pageData, setPageData] = useState<{
+        name: string;
+        semester: string;
+        courses: string[];
+        decodedName: string;
+        error?: string;
+    } | null>(null);
 
-    // 檢查必要參數
-    if (!name || !semester || !courses) {
+    useEffect(() => {
+        const name = searchParams.get('name');
+        const semester = searchParams.get('semester');
+        const courses = searchParams.get('courses');
+
+        // 檢查必要參數
+        if (!name || !semester || !courses) {
+            setPageData(null);
+            return;
+        }
+
+        // 解碼 base64 編碼的暱稱
+        try {
+            const decodedName = decodeURIComponent(
+                atob(name + '='.repeat((4 - name.length % 4) % 4))
+            );
+
+            setPageData({
+                name,
+                semester,
+                courses: courses.split(','),
+                decodedName
+            });
+        } catch (error) {
+            setPageData({
+                name,
+                semester,
+                courses: courses.split(','),
+                decodedName: '',
+                error: String(error)
+            });
+        }
+    }, [searchParams]);
+
+    // 載入中狀態
+    if (pageData === null) {
         return (
             <div className="min-h-screen bg-gray-50">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -21,27 +64,40 @@ export default async function SharedSchedulePage({ searchParams }: SharePageProp
         );
     }
 
-    // 解碼 base64 編碼的暱稱
-    let decodedName;
-    try {
-        decodedName = decodeURIComponent(
-            atob(name + '='.repeat((4 - name.length % 4) % 4))
-        );
-    } catch (error) {
+    // 錯誤狀態
+    if (pageData.error) {
         return (
             <div className="min-h-screen bg-gray-50">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                     <div className="text-center py-16">
                         <p className="text-gray-600 font-medium">無效的分享連結</p>
-                        <p className="text-gray-500">{String(error)}</p>
+                        <p className="text-gray-500">{pageData.error}</p>
                     </div>
                 </div>
             </div>
         );
     }
 
-    const courseIds = courses.split(',');
+    return (
+        <div className="min-h-screen bg-gray-50">
+            <div className="max-w-7xl mx-auto">
+                <ScheduleOperations
+                    name={pageData.decodedName}
+                    semester={pageData.semester}
+                    courses={pageData.courses}
+                />
+                <ScheduleClient
+                    sharedName={pageData.decodedName}
+                    sharedSemester={pageData.semester}
+                    sharedCourseIds={pageData.courses}
+                />
+            </div>
+        </div>
+    );
+}
 
+// 主要的頁面組件
+export default function SharedSchedulePage() {
     return (
         <Suspense fallback={
             <div className="min-h-screen bg-gray-50">
@@ -55,16 +111,7 @@ export default async function SharedSchedulePage({ searchParams }: SharePageProp
                 </div>
             </div>
         }>
-            <div className="min-h-screen bg-gray-50">
-                <div className="max-w-7xl mx-auto">
-                    <ScheduleOperations name={decodedName} semester={semester} courses={courseIds} />
-                    <ScheduleClient
-                        sharedName={decodedName}
-                        sharedSemester={semester}
-                        sharedCourseIds={courseIds}
-                    />
-                </div>
-            </div>
+            <SharedScheduleContent />
         </Suspense>
     );
 }
