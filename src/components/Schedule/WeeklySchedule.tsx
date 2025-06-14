@@ -9,6 +9,7 @@ interface WeeklyScheduleProps {
     courses: ScheduleCourse[];
     semester: string;
     onRemoveCourse: (courseId: string) => void;
+    isShared?: boolean;
 }
 
 const timeSlots = [
@@ -38,7 +39,7 @@ const days = [
     { key: "五", name: "週五" },
 ];
 
-export default function WeeklySchedule({ courses, semester, onRemoveCourse }: WeeklyScheduleProps) {
+export default function WeeklySchedule({ courses, semester, onRemoveCourse, isShared = false }: WeeklyScheduleProps) {
     // 建立時間表格資料結構
     const scheduleGrid: { [day: string]: { [period: number]: ScheduleCourse | null } } = {};
 
@@ -158,7 +159,6 @@ export default function WeeklySchedule({ courses, semester, onRemoveCourse }: We
                                 {filteredDays.map(day => {
                                     const mergedCourse = mergedCourses[day.key][slot.period];
 
-                                    // 如果這個格子被標記為隱藏（因為被合併了），就不渲染
                                     if (mergedCourse?.isHidden) {
                                         return null;
                                     }
@@ -195,19 +195,21 @@ export default function WeeklySchedule({ courses, semester, onRemoveCourse }: We
                                                         )}
                                                     </Link>
 
-                                                    {/* 移除按鈕 */}
-                                                    <motion.button
-                                                        onClick={(e) => {
-                                                            e.preventDefault();
-                                                            e.stopPropagation();
-                                                            onRemoveCourse(mergedCourse.course.course_id);
-                                                        }}
-                                                        className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-red-600 shadow-sm z-10"
-                                                        whileHover={{ scale: 1.1 }}
-                                                        whileTap={{ scale: 0.9 }}
-                                                    >
-                                                        <Trash2 className="w-3 h-3" />
-                                                    </motion.button>
+                                                    {/* 移除按鈕 - 只在非分享模式下顯示 */}
+                                                    {!isShared && (
+                                                        <motion.button
+                                                            onClick={(e) => {
+                                                                e.preventDefault();
+                                                                e.stopPropagation();
+                                                                onRemoveCourse(mergedCourse.course.course_id);
+                                                            }}
+                                                            className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-red-600 shadow-sm z-10"
+                                                            whileHover={{ scale: 1.1 }}
+                                                            whileTap={{ scale: 0.9 }}
+                                                        >
+                                                            <Trash2 className="w-3 h-3" />
+                                                        </motion.button>
+                                                    )}
                                                 </motion.div>
                                             ) : (
                                                 <div className="h-full w-full flex items-center justify-center text-gray-300 hover:bg-gray-50 transition-colors rounded-sm group">
