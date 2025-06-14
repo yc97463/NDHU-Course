@@ -23,6 +23,8 @@ const fetcher = (url: string) => fetch(url).then(res => res.json());
 
 export default function ScheduleClient({
     sharedName,
+    sharedSemester,
+    sharedCourseIds,
 }: ScheduleClientProps) {
     const [availableSemesters, setAvailableSemesters] = useState<string[]>([]);
     const [selectedSemester, setSelectedSemester] = useState<string>("");
@@ -53,21 +55,26 @@ export default function ScheduleClient({
 
         try {
             setIsLoading(true);
-            // 從 localStorage 讀取該學期的課程資料
-            const storedData = localStorage.getItem(`schedule_${selectedSemester}`);
-            if (storedData) {
-                const parsedData = JSON.parse(storedData);
-                setCourses(parsedData);
-            } else {
-                setCourses([]);
+
+            if (isSharedView) {
+                // 分享視圖不需要從 localStorage 讀取數據
+                return;
             }
+
+            // 使用 ScheduleStorage 來讀取數據
+            const semesterCourses = ScheduleStorage.getSemesterCourses(selectedSemester);
+            setCourses(semesterCourses);
+
+            // 更新可用學期列表
+            const availableSemesters = ScheduleStorage.getAvailableSemesters();
+            setAvailableSemesters(availableSemesters);
         } catch (error) {
             console.error('Error loading schedule data:', error);
             setCourses([]);
         } finally {
             setIsLoading(false);
         }
-    }, [selectedSemester]);
+    }, [selectedSemester, isSharedView]);
 
     // 使用 SWR 獲取課程資料
     const { data: courseData, isLoading: isCourseLoading } = useSWR(
@@ -122,12 +129,37 @@ export default function ScheduleClient({
         });
     }, [selectedSemester]);
 
-    // 當學期改變時重新載入資料
+    // 初始化載入
     useEffect(() => {
-        if (selectedSemester && !isSharedView) {
+        if (!isSharedView) {
+            // 從 localStorage 讀取使用者名稱
+            const storedName = localStorage.getItem(USER_NAME_STORAGE_KEY);
+            if (storedName) {
+                setUserName(storedName);
+            }
+
+            // 載入可用學期
+            const availableSemesters = ScheduleStorage.getAvailableSemesters();
+            setAvailableSemesters(availableSemesters);
+
+            // 如果有可用學期，選擇最新的一個
+            if (availableSemesters.length > 0) {
+                const sortedSemesters = [...availableSemesters].sort((a, b) => {
+                    const [yearA, termA] = a.split("-").map(Number);
+                    const [yearB, termB] = b.split("-").map(Number);
+                    return yearB === yearA ? termB - termA : yearB - yearA;
+                });
+                setSelectedSemester(sortedSemesters[0]);
+            }
+        }
+    }, [isSharedView]);
+
+    // 當選擇的學期改變時重新載入資料
+    useEffect(() => {
+        if (selectedSemester) {
             loadScheduleData();
         }
-    }, [selectedSemester, isSharedView, loadScheduleData]);
+    }, [selectedSemester, loadScheduleData]);
 
     // 當課程資料更新時更新狀態
     useEffect(() => {
@@ -138,25 +170,28 @@ export default function ScheduleClient({
         }
     }, [courseData, isSharedView, transformCourseData]);
 
-    // 載入一般視圖資料
+    // 初始化分享視圖
     useEffect(() => {
-        if (!isSharedView) {
-            loadScheduleData();
-            // 從 localStorage 讀取使用者名稱
-            const storedName = localStorage.getItem(USER_NAME_STORAGE_KEY);
-            if (storedName) {
-                setUserName(storedName);
-            }
-        }
-    }, [isSharedView, loadScheduleData]);
+        if (isSharedView && sharedName && sharedSemester && sharedCourseIds) {
+            setUserName(sharedName);
+            setSelectedSemester(sharedSemester);
+            setAvailableSemesters([sharedSemester]);
 
-    // 當選擇的學期改變時載入該學期的課程
-    useEffect(() => {
-        if (selectedSemester && !isSharedView) {
-            const semesterCourses = ScheduleStorage.getSemesterCourses(selectedSemester);
-            setCourses(semesterCourses);
+            // 初始化課程列表
+            const initialCourses = sharedCourseIds.map(courseId => ({
+                course_id: courseId,
+                course_name: '',
+                english_course_name: '',
+                teacher: [],
+                classroom: [],
+                credits: '',
+                class_time: [],
+                semester: sharedSemester,
+                departments: []
+            }));
+            setCourses(initialCourses);
         }
-    }, [selectedSemester, isSharedView]);
+    }, [isSharedView, sharedName, sharedSemester, sharedCourseIds]);
 
     // 儲存使用者名稱到 localStorage
     const saveUserName = (name: string) => {
