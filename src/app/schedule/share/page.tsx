@@ -1,10 +1,12 @@
 import { Suspense } from "react";
 import ScheduleClient from "@/components/Schedule/ScheduleClient";
 import ScheduleOperations from "@/components/Schedule/ScheduleOperations";
-import { SharePageProps } from "@/utils/types";
+import { SharePageProps, SharePageSearchParams } from "@/utils/types";
 
 export default async function SharedSchedulePage({ searchParams }: SharePageProps) {
-    const { name, semester, courses } = await searchParams;
+    // Await the searchParams promise
+    const params = await searchParams;
+    const { name, semester, courses } = params as SharePageSearchParams;
 
     // 檢查必要參數
     if (!name || !semester || !courses) {
@@ -65,4 +67,4 @@ export default async function SharedSchedulePage({ searchParams }: SharePageProp
             </div>
         </Suspense>
     );
-} 
+}

@@ -32,7 +32,7 @@ export interface SharePageSearchParams {
     courses?: string;
 }
 
-// 分享頁面的 Props 類型
+// 分享頁面的 Props 類型 - Updated for Next.js 15
 export type SharePageProps = {
-    searchParams: Promise<SharePageSearchParams>;
-} 
+    searchParams: Promise<Record<string, string | string[] | undefined>>;
+}
