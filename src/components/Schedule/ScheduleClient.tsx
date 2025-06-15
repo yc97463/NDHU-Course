@@ -186,6 +186,9 @@ export default function ScheduleClient({
                     return yearB === yearA ? termB - termA : yearB - yearA;
                 });
                 setSelectedSemester(sortedSemesters[0]);
+            } else {
+                // 如果沒有可用學期，直接設置載入完成
+                setIsLoading(false);
             }
         }
     }, [isSharedView]);
