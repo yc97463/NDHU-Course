@@ -3,7 +3,7 @@ import { ScheduleData, ScheduleCourse } from '@/types/schedule';
 const SCHEDULE_STORAGE_KEY = 'ndhu-course-schedule';
 
 export class ScheduleStorage {
-    // 獲取所有時刻表資料
+    // 獲取所有課表資料
     static getScheduleData(): ScheduleData {
         if (typeof window === 'undefined') return {};
 
@@ -24,7 +24,7 @@ export class ScheduleStorage {
         }
     }
 
-    // 儲存時刻表資料
+    // 儲存課表資料
     static saveScheduleData(data: ScheduleData): void {
         if (typeof window === 'undefined') return;
 
@@ -54,7 +54,7 @@ export class ScheduleStorage {
         return courses;
     }
 
-    // 添加課程到時刻表
+    // 添加課程到課表
     static addCourse(semester: string, course: ScheduleCourse): boolean {
         if (!semester || !course || !course.course_id) {
             console.error('Invalid course data');
@@ -84,7 +84,7 @@ export class ScheduleStorage {
         return true;
     }
 
-    // 從時刻表移除課程
+    // 從課表移除課程
     static removeCourse(semester: string, courseId: string): void {
         if (!semester || !courseId) {
             console.error('Invalid semester or courseId');
@@ -99,7 +99,7 @@ export class ScheduleStorage {
         }
     }
 
-    // 檢查課程是否已在時刻表中
+    // 檢查課程是否已在課表中
     static isCourseInSchedule(semester: string, courseId: string): boolean {
         if (!semester || !courseId) return false;
 
@@ -144,7 +144,7 @@ export class ScheduleStorage {
         });
     }
 
-    // 清空特定學期的時刻表
+    // 清空特定學期的課表
     static clearSemester(semester: string): void {
         if (!semester) return;
 
@@ -153,7 +153,7 @@ export class ScheduleStorage {
         this.saveScheduleData(data);
     }
 
-    // 清空所有時刻表
+    // 清空所有課表
     static clearAll(): void {
         if (typeof window === 'undefined') return;
         localStorage.removeItem(SCHEDULE_STORAGE_KEY);

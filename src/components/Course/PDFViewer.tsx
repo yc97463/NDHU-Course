@@ -239,7 +239,7 @@ export default function PDFViewer({ url, teaching_plan_link }: PDFViewerProps) {
                                 className="underline flex items-center space-x-1"
                             >
                                 <Search className="h-4 w-4 inline-block" />
-                                東華課程查詢系統
+                                東華查課拉
                             </Link>、
                             <Link
                                 href={teaching_plan_link}

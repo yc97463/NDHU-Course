@@ -267,7 +267,7 @@ export default function ScheduleClient({
                         <div className="inline-flex items-center justify-center w-16 h-16 bg-indigo-100 rounded-full mb-4">
                             <div className="animate-spin w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full"></div>
                         </div>
-                        <p className="text-gray-600 font-medium">載入時刻表中...</p>
+                        <p className="text-gray-600 font-medium">載入課表中...</p>
                     </div>
                 </div>
             </div>
@@ -388,7 +388,7 @@ export default function ScheduleClient({
                     </div>
                 )}
 
-                {/* 時刻表 */}
+                {/* 課表 */}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -403,7 +403,7 @@ export default function ScheduleClient({
                                 </div>
                                 <h3 className="text-xl font-semibold text-gray-900 mb-2">還沒有任何課程</h3>
                                 <p className="text-gray-600 mb-6">
-                                    請到課程詳細頁面將課程加入到時刻表中
+                                    請到課程詳細頁面將課程加入到課表中
                                 </p>
                                 <motion.a
                                     href="/"
@@ -415,7 +415,7 @@ export default function ScheduleClient({
                                 </motion.a>
                             </div>
 
-                            {/* 顯示空的時刻表 */}
+                            {/* 顯示空的課表 */}
                             <WeeklySchedule
                                 courses={[]}
                                 semester=""
@@ -453,7 +453,7 @@ export default function ScheduleClient({
                             </div>
                             <div className="flex items-start space-x-3">
                                 <div className="w-2 h-2 bg-emerald-500 rounded-full mt-2 flex-shrink-0"></div>
-                                <span>可以切換不同學期查看時刻表</span>
+                                <span>可以切換不同學期查看課表</span>
                             </div>
                             <div className="flex items-start space-x-3">
                                 <div className="w-2 h-2 bg-amber-500 rounded-full mt-2 flex-shrink-0"></div>

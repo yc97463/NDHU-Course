@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "NDHU 課程查詢系統",
-  description: "國立東華大學課程查詢與時刻表管理系統",
+  title: "NDHU 查課拉",
+  description: "國立東華大學課程查詢及課表管理系統",
 };
 
 export default function RootLayout({

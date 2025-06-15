@@ -111,7 +111,7 @@ export default function ClientHome() {
                         探索課程
                     </h1>
                     <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                        選擇學期，瀏覽課程，建立您的專屬時刻表
+                        選擇學期，瀏覽課程，建立您的專屬課表
                     </p>
                 </div>
 

@@ -53,7 +53,7 @@ export default function CourseDetailClient({ course }: CourseProps) {
     const router = useRouter();
     const semester = params.semester as string;
 
-    // 檢查課程是否已在時刻表中
+    // 檢查課程是否已在課表中
     useEffect(() => {
         if (semester && course.course_id) {
             const inSchedule = ScheduleStorage.isCourseInSchedule(semester, course.course_id);
@@ -102,7 +102,7 @@ export default function CourseDetailClient({ course }: CourseProps) {
                 if (hasConflict) {
                     alert('無法加入課程：與現有課程時間衝突！');
                 } else {
-                    alert('課程已存在於時刻表中！');
+                    alert('課程已存在於課表中！');
                 }
             }
         } catch (error) {
@@ -209,8 +209,8 @@ export default function CourseDetailClient({ course }: CourseProps) {
                                 {isAddingToSchedule
                                     ? "處理中..."
                                     : isInSchedule
-                                        ? "從時刻表移除"
-                                        : "加入時刻表"
+                                        ? "從課表移除"
+                                        : "加入課表"
                                 }
                             </motion.button>
 

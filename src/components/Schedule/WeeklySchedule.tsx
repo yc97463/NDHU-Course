@@ -134,7 +134,7 @@ export default function WeeklySchedule({ courses, semester, onRemoveCourse, isSh
                 </div>
             </div>
 
-            {/* 時刻表 */}
+            {/* 課表 */}
             <div className="overflow-x-auto">
                 <table className="min-w-full border-collapse bg-white rounded-lg overflow-hidden">
                     <thead>

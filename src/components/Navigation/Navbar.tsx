@@ -17,7 +17,7 @@ export default function Navbar() {
         },
         {
             href: "/schedule",
-            label: "我的時刻表",
+            label: "我的課表",
             icon: Calendar,
             active: pathname === "/schedule"
         }
@@ -42,7 +42,7 @@ export default function Navbar() {
                             </div>
                             <div className="flex flex-col">
                                 <span className="text-lg font-bold text-gray-900">NDHU Course</span>
-                                <span className="text-xs text-gray-500 -mt-1">東華課程系統</span>
+                                <span className="text-xs text-gray-500 -mt-1">東華查課拉</span>
                             </div>
                         </motion.div>
                     </Link>
@@ -55,8 +55,8 @@ export default function Navbar() {
                                 <Link key={item.href} href={item.href}>
                                     <motion.div
                                         className={`relative flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-200 ${item.active
-                                                ? "bg-indigo-50 text-indigo-700 shadow-sm"
-                                                : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                                            ? "bg-indigo-50 text-indigo-700 shadow-sm"
+                                            : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                                             }`}
                                         whileHover={{ scale: 1.02 }}
                                         whileTap={{ scale: 0.98 }}
