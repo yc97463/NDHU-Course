@@ -47,7 +47,7 @@ export default function SyllabusViewerClient({ course, semester, id }: SyllabusV
         setTimeout(() => setCopied(false), 2000);
     };
 
-    const syllabus_proxy_url = `https://ndhu-course-syllabus-proxy.yccccccccccc.workers.dev/?sqlid=${course.sql_id}`;
+    const syllabus_proxy_url = `https://ndhu-course-syllabus-proxy.yccccccccccc.workers.dev/syllabus?sqlid=${course.sql_id}`;
 
     return (
         <div className="min-h-screen bg-gray-50">
