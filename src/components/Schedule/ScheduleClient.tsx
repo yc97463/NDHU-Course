@@ -418,7 +418,7 @@ export default function ScheduleClient({
                             {/* 顯示空的課表 */}
                             <WeeklySchedule
                                 courses={[]}
-                                semester=""
+                                semester={selectedSemester}
                                 onRemoveCourse={handleRemoveCourse}
                                 isShared={isSharedView}
                             />
