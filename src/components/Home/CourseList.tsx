@@ -3,7 +3,7 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { ArrowRight, BookOpen, Grid3X3, List, X, Filter, Plus, Check, Loader2, Minus } from "lucide-react";
+import { ArrowRight, BookOpen, X, Filter, Plus, Loader2, Minus } from "lucide-react";
 import { useVirtualizer, VirtualItem } from '@tanstack/react-virtual';
 import { useRef, useState, useMemo, useEffect } from 'react';
 import { ScheduleStorage } from "@/utils/scheduleStorage";
