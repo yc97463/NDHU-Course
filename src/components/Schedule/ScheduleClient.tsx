@@ -34,6 +34,7 @@ export default function ScheduleClient({
     const [isCopied, setIsCopied] = useState(false);
     const [isSharedView] = useState(!!sharedName);
     const [isEditingName, setIsEditingName] = useState(false);
+    const [shouldGenerateShortUrl, setShouldGenerateShortUrl] = useState(false);
 
     // 處理學期變更
     const onSemesterChange = (semester: string) => {
@@ -86,6 +87,41 @@ export default function ScheduleClient({
             revalidateOnFocus: false,
             revalidateOnReconnect: false,
             dedupingInterval: 60000, // 1分鐘內不重複請求
+        }
+    );
+
+    // 生成短網址的 SWR
+    const generateShortUrlKey = shouldGenerateShortUrl && selectedSemester && courses.length > 0
+        ? {
+            name: btoa(encodeURIComponent(userName || 'anonymous')).replace(/=/g, ''),
+            semester: selectedSemester,
+            courses: courses.map(course => course.course_id).join(',')
+        }
+        : null;
+
+    const { data: shortUrlData, isLoading: isGeneratingShortUrl, error: shortUrlError } = useSWR(
+        generateShortUrlKey,
+        async (params) => {
+            const proxyUrl = 'https://ndhu-course-syllabus-proxy.yccccccccccc.workers.dev/share';
+            const urlParams = new URLSearchParams({
+                name: params.name,
+                semester: params.semester,
+                courses: params.courses
+            });
+
+            const response = await fetch(`${proxyUrl}?${urlParams.toString()}`);
+            const data = await response.json();
+
+            if (!data.success || !data.data.shortUrl) {
+                throw new Error('Failed to generate short URL');
+            }
+
+            return data.data.shortUrl;
+        },
+        {
+            revalidateOnFocus: false,
+            revalidateOnReconnect: false,
+            dedupingInterval: 300000, // 5分鐘內不重複請求
         }
     );
 
@@ -246,17 +282,45 @@ export default function ScheduleClient({
     };
 
     const handleCopyLink = async () => {
-        const shareLink = generateShareLink();
-        if (!shareLink) return;
+        if (!selectedSemester || courses.length === 0) return;
 
-        try {
-            await navigator.clipboard.writeText(shareLink);
-            setIsCopied(true);
-            setTimeout(() => setIsCopied(false), 2000);
-        } catch (err) {
-            console.error('Failed to copy link:', err);
-        }
+        // 觸發 SWR 請求生成短網址
+        setShouldGenerateShortUrl(true);
     };
+
+    // 當短網址生成完成時，複製到剪貼簿
+    useEffect(() => {
+        if (shortUrlData && shouldGenerateShortUrl) {
+            navigator.clipboard.writeText(shortUrlData).then(() => {
+                setIsCopied(true);
+                setTimeout(() => setIsCopied(false), 2000);
+                setShouldGenerateShortUrl(false);
+            }).catch((err) => {
+                console.error('Failed to copy short URL:', err);
+                setShouldGenerateShortUrl(false);
+            });
+        }
+    }, [shortUrlData, shouldGenerateShortUrl]);
+
+    // 當短網址生成失敗時，回退到長網址
+    useEffect(() => {
+        if (shortUrlError && shouldGenerateShortUrl) {
+            console.error('Failed to generate short URL:', shortUrlError);
+            const shareLink = generateShareLink();
+            if (shareLink) {
+                navigator.clipboard.writeText(shareLink).then(() => {
+                    setIsCopied(true);
+                    setTimeout(() => setIsCopied(false), 2000);
+                }).catch((fallbackErr) => {
+                    console.error('Failed to copy fallback link:', fallbackErr);
+                }).finally(() => {
+                    setShouldGenerateShortUrl(false);
+                });
+            } else {
+                setShouldGenerateShortUrl(false);
+            }
+        }
+    }, [shortUrlError, shouldGenerateShortUrl]);
 
     if (isLoading || isCourseLoading) {
         console.log('Rendering loading state', { isLoading, isCourseLoading });
@@ -355,11 +419,20 @@ export default function ScheduleClient({
                                     <div className="flex gap-3">
                                         <motion.button
                                             onClick={handleCopyLink}
-                                            className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white/80 backdrop-blur-sm border border-gray-200 rounded-lg hover:bg-white hover:border-gray-300 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all duration-200"
-                                            whileHover={{ scale: 1.02 }}
-                                            whileTap={{ scale: 0.98 }}
+                                            disabled={isGeneratingShortUrl}
+                                            className={`inline-flex items-center px-4 py-2 text-sm font-medium border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all duration-200 ${isGeneratingShortUrl
+                                                ? 'text-gray-500 bg-gray-100 border-gray-200 cursor-not-allowed'
+                                                : 'text-gray-700 bg-white/80 backdrop-blur-sm border-gray-200 hover:bg-white hover:border-gray-300 hover:shadow-md'
+                                                }`}
+                                            whileHover={!isGeneratingShortUrl ? { scale: 1.02 } : {}}
+                                            whileTap={!isGeneratingShortUrl ? { scale: 0.98 } : {}}
                                         >
-                                            {isCopied ? (
+                                            {isGeneratingShortUrl ? (
+                                                <>
+                                                    <div className="w-4 h-4 mr-2 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+                                                    生成中...
+                                                </>
+                                            ) : isCopied ? (
                                                 <>
                                                     <Copy className="w-4 h-4 mr-2 text-indigo-600" />
                                                     已複製！
