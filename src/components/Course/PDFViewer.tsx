@@ -42,7 +42,7 @@ export default function PDFViewer({ url, teaching_plan_link }: PDFViewerProps) {
                 setContentType(contentType);
 
                 // If not PDF, display the content as text/html
-                if (!contentType.includes('application/pdf')) {
+                if (!contentType.includes('application/pdf') || !contentType.includes('application/.pdf')) {
                     const text = await response.text();
                     setNonPdfContent(text);
                     if (!contentType.includes('text/html') && !contentType.includes('text/plain')) {
