@@ -11,7 +11,7 @@ export default function Navbar() {
     const navItems = [
         {
             href: "/",
-            label: "課程列表",
+            label: "瀏覽課表",
             icon: BookOpen,
             active: pathname === "/"
         },
