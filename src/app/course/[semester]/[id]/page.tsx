@@ -53,7 +53,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
         return {
             title: `${course.course_name} (${course.course_id})`,
-            description: `教師: ${course.teacher.join(", ")} - 學分數: ${course.credits}`,
+            description: `教師：${course.teacher.join(", ")} - 學分數：${course.credits}`,
         };
     } catch (error) {
         console.error("Error generating metadata:", error);

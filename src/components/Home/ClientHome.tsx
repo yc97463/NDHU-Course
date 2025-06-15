@@ -9,6 +9,10 @@ interface CourseData {
     [courseId: string]: {
         course_id: string;
         course_name: string;
+        college?: string;
+        offering_department?: string;
+        teacher?: string;
+        credits?: string;
         // other fields...
     };
 }
@@ -16,6 +20,10 @@ interface CourseData {
 interface CourseInfo {
     id: string;
     name: string;
+    college?: string;
+    offering_department?: string;
+    teacher?: string;
+    credits?: string;
 }
 
 interface SemesterData {
@@ -44,37 +52,43 @@ export default function ClientHome() {
 
         // Create a key that includes all selected semesters
         return `semester-courses-${selectedSemesters.join(',')}`;
-    }, async () => {
-        // Fetch all selected semesters in parallel
-        const results: { [key: string]: CourseInfo[] } = {};
+    },
+        async () => {
+            // Fetch all selected semesters in parallel
+            const results: { [key: string]: CourseInfo[] } = {};
 
-        await Promise.all(
-            selectedSemesters.map(async (semester) => {
-                try {
-                    const courseRes = await fetch(
-                        `https://yc97463.github.io/ndhu-course-crawler/${semester}/main.json`
-                    );
+            await Promise.all(
+                selectedSemesters.map(async (semester) => {
+                    try {
+                        const courseRes = await fetch(
+                            `https://yc97463.github.io/ndhu-course-crawler/${semester}/main.json`
+                        );
 
-                    if (!courseRes.ok) {
-                        throw new Error(`Failed to fetch courses for semester ${semester}`);
+                        if (!courseRes.ok) {
+                            throw new Error(`Failed to fetch courses for semester ${semester}`);
+                        }
+
+                        const coursesData: CourseData = await courseRes.json();
+
+                        // Transform the course data with complete information
+                        results[semester] = Object.entries(coursesData).map(([courseId, courseDetails]) => ({
+                            id: courseId,
+                            name: courseDetails.course_name || courseId,
+                            college: courseDetails.college,
+                            offering_department: courseDetails.offering_department,
+                            teacher: courseDetails.teacher,
+                            credits: courseDetails.credits
+                        }));
+                    } catch (error) {
+                        console.error(`Error fetching data for semester ${semester}:`, error);
+                        results[semester] = []; // Use empty array on error
                     }
+                })
+            );
 
-                    const coursesData: CourseData = await courseRes.json();
-
-                    // Transform the course data
-                    results[semester] = Object.entries(coursesData).map(([courseId, courseDetails]) => ({
-                        id: courseId,
-                        name: courseDetails.course_name || courseId
-                    }));
-                } catch (error) {
-                    console.error(`Error fetching data for semester ${semester}:`, error);
-                    results[semester] = []; // Use empty array on error
-                }
-            })
-        );
-
-        return results;
-    });
+            return results;
+        }
+    );
 
     // Handle semester selection
     const handleSemesterSelect = (semester: string) => {

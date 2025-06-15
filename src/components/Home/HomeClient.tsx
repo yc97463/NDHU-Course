@@ -1,11 +1,17 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { Grid3X3, List } from "lucide-react";
+import { useState } from "react";
 import CourseList from "./CourseList";
 
 interface CourseInfo {
     id: string;
     name: string;
+    college?: string;
+    offering_department?: string;
+    teacher?: string;
+    credits?: string;
 }
 
 interface SemesterData {
@@ -18,6 +24,8 @@ interface HomeClientProps {
 }
 
 export default function HomeClient({ semesterData }: HomeClientProps) {
+    const [viewMode, setViewMode] = useState<'virtual' | 'grid'>('grid');
+
     return (
         <div className="space-y-8">
             {semesterData.map((data, index) => (
@@ -37,17 +45,45 @@ export default function HomeClient({ semesterData }: HomeClientProps) {
                                     {data.semester} 學期
                                 </h2>
                             </div>
-                            <div className="flex items-center space-x-2">
+                            <div className="flex items-center space-x-4">
                                 <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-700">
                                     {data.courses.length} 門課程
                                 </span>
+
+                                {/* 顯示模式切換 */}
+                                <div className="flex bg-gray-100 rounded-lg p-1">
+                                    <button
+                                        onClick={() => setViewMode('grid')}
+                                        className={`flex items-center justify-center space-x-1 px-3 py-1.5 rounded-md text-sm font-medium transition-all min-w-[80px] ${viewMode === 'grid'
+                                            ? 'bg-white text-indigo-700 shadow-sm'
+                                            : 'text-gray-600 hover:text-gray-900'
+                                            }`}
+                                    >
+                                        <Grid3X3 className="w-4 h-4" />
+                                        <span>網格</span>
+                                    </button>
+                                    <button
+                                        onClick={() => setViewMode('virtual')}
+                                        className={`flex items-center justify-center space-x-1 px-3 py-1.5 rounded-md text-sm font-medium transition-all min-w-[80px] ${viewMode === 'virtual'
+                                            ? 'bg-white text-indigo-700 shadow-sm'
+                                            : 'text-gray-600 hover:text-gray-900'
+                                            }`}
+                                    >
+                                        <List className="w-4 h-4" />
+                                        <span>列表</span>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
 
                     {/* 課程列表 */}
                     <div className="p-6">
-                        <CourseList courses={data.courses} semester={data.semester} />
+                        <CourseList
+                            courses={data.courses}
+                            semester={data.semester}
+                            viewMode={viewMode}
+                        />
                     </div>
                 </motion.div>
             ))}
