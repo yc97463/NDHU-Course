@@ -17,7 +17,7 @@ import {
     MapPin
 } from "lucide-react";
 import { useState, useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ScheduleStorage } from "@/utils/scheduleStorage";
 import { ScheduleCourse } from "@/types/schedule";
@@ -42,16 +42,16 @@ interface CourseProps {
         syllabus_link: string;
         teaching_plan_link: string;
     };
+    semester: string;  // 新增 semester prop
+    courseId: string;  // 新增 courseId prop
 }
 
-export default function CourseDetailClient({ course }: CourseProps) {
+export default function CourseDetailClient({ course, semester, courseId }: CourseProps) {
     const [linkCopied, setLinkCopied] = useState(false);
     const [courseIdCopied, setCourseIdCopied] = useState(false);
     const [isInSchedule, setIsInSchedule] = useState(false);
     const [isAddingToSchedule, setIsAddingToSchedule] = useState(false);
-    const params = useParams();
     const router = useRouter();
-    const semester = params.semester as string;
 
     // 檢查課程是否已在課表中
     useEffect(() => {
@@ -580,7 +580,7 @@ export default function CourseDetailClient({ course }: CourseProps) {
                                 <h2 className="text-lg font-semibold text-gray-900">相關資源</h2>
                             </div>
                             <div className="flex flex-col gap-3">
-                                <Link href={`/course/${params.semester}/${params.id}/syllabus`}>
+                                <Link href={`/course/${semester}/${courseId}/syllabus`}>
                                     <motion.div
                                         className="block bg-indigo-50 hover:bg-indigo-100 rounded-lg p-4 transition-colors cursor-pointer border border-indigo-200"
                                         whileHover={{ scale: 1.02 }}

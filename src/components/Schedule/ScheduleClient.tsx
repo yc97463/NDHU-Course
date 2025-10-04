@@ -272,7 +272,7 @@ export default function ScheduleClient({
         }
     };
 
-    const generateShareLink = () => {
+    const generateShareLink = useCallback(() => {
         if (!selectedSemester || courses.length === 0) return '';
 
         // 生成課程 ID 字串
@@ -282,7 +282,7 @@ export default function ScheduleClient({
         const baseUrl = window.location.origin;
         const encodedName = btoa(encodeURIComponent(userName || 'anonymous')).replace(/=/g, '');
         return `${baseUrl}/schedule/share?name=${encodedName}&semester=${selectedSemester}&courses=${courseIds}`;
-    };
+    }, [selectedSemester, courses, userName]);
 
     const handleCopyLink = async () => {
         if (!selectedSemester || courses.length === 0) return;
@@ -323,7 +323,7 @@ export default function ScheduleClient({
                 setShouldGenerateShortUrl(false);
             }
         }
-    }, [shortUrlError, shouldGenerateShortUrl]);
+    }, [shortUrlError, shouldGenerateShortUrl, generateShareLink]);
 
     if (isLoading || isCourseLoading) {
         console.log('Rendering loading state', { isLoading, isCourseLoading });

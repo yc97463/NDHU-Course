@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Grid3X3, List } from "lucide-react";
 import { useState } from "react";
 import CourseList from "./CourseList";
+import Link from "next/link";
 
 interface CourseInfo {
     id: string;
@@ -44,6 +45,9 @@ export default function HomeClient({ semesterData }: HomeClientProps) {
                                 <h2 className="text-xl font-semibold text-gray-900">
                                     {data.semester} 學期
                                 </h2>
+                                <Link href={`/search/${data.semester}`} className="text-sm text-indigo-600 rounded px-2.5 py-1.5 transition bg-indigo-100 hover:bg-indigo-200">
+                                    進階搜尋
+                                </Link>
                             </div>
                             <div className="flex items-center space-x-4">
                                 <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-700">
