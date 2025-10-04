@@ -11,8 +11,8 @@ export async function generateStaticParams(): Promise<{ semester: string; id: st
         }
 
         const semesters: string[] = await semestersRes.json();
-        // Pre-generate only for the latest semester to keep export size manageable.
-        const targetSemesters = semesters.slice(0, 1);
+        // Pre-generate for all semesters listed in the API to support full browsing
+        const targetSemesters = semesters;
 
         for (const semester of targetSemesters) {
             const coursesRes = await fetch(`https://yc97463.github.io/ndhu-course-crawler/${semester}/main.json`);

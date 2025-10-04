@@ -31,9 +31,8 @@ export async function generateStaticParams(): Promise<{ semester: string }[]> {
 
         const semesters: string[] = await response.json();
 
-        // 僅使用最新學期（例如 114-1），避免在 static export 期間產生過多路徑
-        const latestOnly = semesters.slice(0, 1);
-        const params: { semester: string }[] = latestOnly.map((semester: string) => ({ semester }));
+        // 匯出所有在 API 中列出的學期，讓 /search/[semester] 都可用
+        const params: { semester: string }[] = semesters.map((semester: string) => ({ semester }));
 
         return params;
     } catch (error) {
