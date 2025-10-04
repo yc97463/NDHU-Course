@@ -1,0 +1,111 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary-50: #f0f4ff;
+  --color-primary-100: #e0e7ff;
+  --color-primary-200: #c7d2fe;
+  --color-primary-300: #a5b4fc;
+  --color-primary-400: #818cf8;
+  --color-primary-500: #6366f1;
+  --color-primary-600: #4f46e5;
+  --color-primary-700: #4338ca;
+  --color-primary-800: #3730a3;
+  --color-primary-900: #312e81;
+}
+
+/* 基礎樣式和自定義 CSS */
+
+/* 基礎樣式 */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 優雅的滾動條 */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-slate-100/50 dark:bg-slate-700/50;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-300/80 dark:bg-slate-500/80 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-slate-400/90 dark:bg-slate-400/90;
+}
+
+/* 現代化選擇樣式 */
+::selection {
+  @apply bg-blue-200 text-blue-800 dark:bg-blue-800 dark:text-blue-200;
+}
+
+/* 按鈕樣式已移至組件中使用 Tailwind 原生類別 */
+
+/* 現代化卡片樣式 */
+.card-modern {
+  @apply bg-white rounded-xl shadow-sm border border-gray-200/50 hover:shadow-md transition-all duration-200;
+}
+
+.card-elevated {
+  @apply bg-white rounded-xl shadow-lg border border-gray-200/50 hover:shadow-xl transition-all duration-200;
+}
+
+/* 現代化輸入框樣式 */
+.input-modern {
+  @apply w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors duration-200;
+}
+
+/* 現代化表格樣式 */
+.table-modern {
+  @apply w-full border-collapse bg-white rounded-xl overflow-hidden shadow-sm;
+}
+
+.table-modern th {
+  @apply bg-gray-50 px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider border-b border-gray-200;
+}
+
+.table-modern td {
+  @apply px-4 py-3 text-sm text-gray-900 border-b border-gray-100 last:border-b-0;
+}
+
+/* 動畫效果 */
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
