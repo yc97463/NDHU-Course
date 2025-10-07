@@ -140,8 +140,8 @@ export default function SearchClient({ courses, semester }: SearchClientProps) {
             result = result.filter(course => {
                 if (!course.class_time || course.class_time.length === 0) return false;
 
-                // 檢查課程是否在選定的時間段內
-                return course.class_time.every(classTime => {
+                // 檢查課程是否有任一時間段符合選定的時間段
+                return course.class_time.some(classTime => {
                     return selectedTimeSlots.some(slot =>
                         slot.day === classTime.day &&
                         slot.period === parseInt(classTime.period)
